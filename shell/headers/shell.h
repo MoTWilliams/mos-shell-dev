@@ -2,6 +2,6 @@
 #ifndef SHELL_H
 #define SHELL_H
 
-
+int runShell_interactive();
 
 #endif
