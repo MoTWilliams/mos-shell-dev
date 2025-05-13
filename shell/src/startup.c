@@ -16,7 +16,10 @@ int main(int argc, char* argv[]) {
         printf(FG_BLU_B BOLD "\nWelcome to Mo's Shell!\n\n" RESET);
 
         if (argv[1]) {
-                printf(BG_RED "[--BATCH MODE UNDER CONSTRUCTION--]\n" RESET);
+                printf(
+                        "%s[--BATCH MODE UNDER CONSTRUCTION--]%s\n", 
+                        BG_RED, NO_BGC
+                );
         } else {
                 printf(FG_BLU_B "Entering interactive input mode" RESET);
                 friv_animatedEllipses(FG_BLU_B);
@@ -29,7 +32,7 @@ int main(int argc, char* argv[]) {
                 printf("\n");
         }
 
-        printf("Goodbye!\n\n");
+        printf(RESET "\nGoodbye!\n\n");
 
         return 0;
 }
