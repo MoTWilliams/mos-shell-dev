@@ -51,6 +51,19 @@ int runShell_interactive() {
                 
                 printf("]\n");
 
+                printf("Token types: [");
+
+                current = tokens->head;
+                while (current) {
+                        printf("%d", current->data.token->type);
+                        current = current->next;
+
+                        if (current) {
+                                printf(", ");
+                        }
+                }
+                printf("]\n");
+
                 dList_destroy(tokens);
 
                 // PLACEHOLDER: Exit on exit
