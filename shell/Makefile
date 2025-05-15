@@ -1,10 +1,16 @@
 CC=gcc
-CFLAGS=-Iheaders -Iutility
-DEPS = $(wildcard headers/*.h utility/*.h)
-SRC = $(wildcard src/*.c src/builtins/*.c)
+
+# Find all header files in src/ and its subdirectories. Only include each once.
+INCLUDES = $(shell find src -name '*.h' -exec dirname {} \; | sort -u)
+
+# Turn all includes into -I flags
+CFLAGS = -g $(addprefix -I, $(INCLUDES))
+
+# Recursively include all .c files in src/
+SRC = $(wildcard src/*.c src/*/*.c src/*/*/*.c)
 OBJ = $(SRC:.c=.o)
 
-%.o: %.c $(DEPS)
+%.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 moshell: $(OBJ)
@@ -13,7 +19,7 @@ moshell: $(OBJ)
 .PHONY: clean
 
 clean:
-	rm -f src/*.o src/builtins/*.o
+	rm -f $(OBJ)
 	rm moshell
 
 install: moshell

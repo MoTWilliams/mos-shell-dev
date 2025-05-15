@@ -7,4 +7,10 @@
 // Initial size for automatically-resizing buffers
 #define BUFF_INIT 32
 
+// Boolean values
+typedef enum {
+    FALSE,
+    TRUE
+} Bool;
+
 #endif

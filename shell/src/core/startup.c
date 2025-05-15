@@ -1,7 +1,7 @@
 #include "report_status.h"
 #include "frivolity.h"
 #include "ansi_codes.h"
-#include "shell.h"
+#include "engine.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -15,11 +15,13 @@ int main(int argc, char* argv[]) {
 
         printf(FG_BLU_B BOLD "\nWelcome to Mo's Shell!\n\n" RESET);
 
+        // Start in batch mode
         if (argv[1]) {
                 printf(
                         "%s[--BATCH MODE UNDER CONSTRUCTION--]%s\n", 
                         BG_RED, NO_BGC
                 );
+        // Start in interactive mode
         } else {
                 printf(FG_BLU_B "Entering interactive input mode" RESET);
                 friv_animatedEllipses(FG_BLU_B);
