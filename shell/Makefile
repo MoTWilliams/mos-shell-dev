@@ -22,15 +22,6 @@ clean:
 	rm -f $(OBJ)
 	rm moshell
 
-install: moshell
-	@{ \
-		cp moshell ~/.local/bin/moshell; \
-		make clean; \
-		if [ -f "$(HOME)/.local/bin/moshell" ]; then \
-			echo "Mo's Shell successfully installed. Use 'moshell' to run."; \
-		fi; \
-	}
-
 uninstall:
 	@{ \
 		if [ -f "$(HOME)/.local/bin/moshell" ]; then \
@@ -42,3 +33,14 @@ uninstall:
 			echo "Mo's Shell is not installed. Nothing to uninstall."; \
 		fi; \
 	}
+
+install: moshell
+	@{ \
+		make uninstall; \
+		cp moshell ~/.local/bin/moshell; \
+		make clean; \
+		if [ -f "$(HOME)/.local/bin/moshell" ]; then \
+			echo "Mo's Shell successfully installed. Use 'moshell' to run."; \
+		fi; \
+	}
+
