@@ -1,6 +1,8 @@
 #ifndef TOKENIZER_H
 #define TOKENIZER_H
 
+#include "constants.h"
+
 struct StringBuffer;
 typedef struct StringBuffer StringBuffer;
 
@@ -10,7 +12,8 @@ typedef struct DList DList;
 typedef enum TokenType {
         TOKEN_NOTYPE,
         WORD,
-        QUOTE,
+        QUOTE_SINGLE,
+        QUOTE_DOUBLE,
         SEMICOLON,
         PIPE,
         REDIR_IN,
@@ -25,6 +28,7 @@ typedef enum TokenType {
 typedef struct Token {
         TokenType type;
         StringBuffer* tokText;
+        Bool unterminatedQuote;
 } Token;
 
 Token* token_create();
