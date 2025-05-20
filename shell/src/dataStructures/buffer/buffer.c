@@ -31,7 +31,7 @@ Buffer* buff_create(BuffType type) {
                 exit(1);
         }
 
-        // Return the initialized string buffer object
+        // Return the initialized buffer object
         return buff;
 }
 
