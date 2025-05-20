@@ -46,6 +46,27 @@ void token_destroy(Token* tok) {
         free(tok);
 }
 
+void token_appendChar(Token* tok, char* src, int pos, QType qType) {
+        // Add the character to the token's string
+        str_append(tok->tokText, src, pos);
+
+        // Add context marker to the character contexts string
+        switch (qType) {
+                case Q_NONE:
+                        str_append(tok->cqTypes, "-", 0);
+                        return;
+                case Q_SINGLE:
+                        str_append(tok->cqTypes, "S", 0);
+                        return;
+                case Q_DOUBLE:
+                        str_append(tok->cqTypes, "D", 0);
+                        return;
+                case Q_BACKTICK:
+                        str_append(tok->cqTypes, "B", 0);
+                        return;
+        }
+}
+
 void token_print(Token* tok) {
         char* tokTextPlain = STR_TEXT(tok->tokText);
 
