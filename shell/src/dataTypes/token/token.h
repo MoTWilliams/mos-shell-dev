@@ -9,10 +9,10 @@ typedef struct String String;
 typedef enum TokType {
         TOK_NOTYPE,     // 0
         TOK_WORD,       // 1
-        TOK_SEQ,        // 2: ;
+        TOK_SEQ,        // 2: ; (sequence)
         TOK_PIPE,       // 3: |
         TOK_OR,         // 4: ||
-        TOK_BG,         // 5: &
+        TOK_BG,         // 5: & (background)
         TOK_AND,        // 6: &&
         TOK_NOT,        // 7: !
         TOK_REDIR_IN,   // 8: <
@@ -21,6 +21,7 @@ typedef enum TokType {
         TOK_APPEND,     // 11: >>
         TOK_PAREN_L,    // 12: (
         TOK_PAREN_R,    // 13: )
+        TOK_EOF         // 14: end of file
 } TokType;
 
 typedef struct Token {
