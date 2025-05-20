@@ -1,10 +1,9 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-#define TOKS_TAIL(toks) ((toks)->tokList->tail->data.token->tokText)
+#include "doublyLinkedList.h"
 
-struct DList;
-typedef struct DList DList;
+#define TOKS_TAIL(toks) ((toks)->tokList->tail->data.token->tokText)
 
 typedef struct TokList {
         // Contents
