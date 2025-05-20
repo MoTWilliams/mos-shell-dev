@@ -1,7 +1,6 @@
 #include "lexer.h"
 #include "token.h"
 #include "moString.h"
-#include "doublyLinkedList.h"
 #include "constants.h"
 
 #include <stdio.h>
@@ -9,9 +8,9 @@
 #include <string.h>
 #include <ctype.h>
 
-void skip_comments(DList* toks, char* input, int* pos);
-void capture_symbol(DList* toks, char* input, int* pos);
-void capture_word(DList* toks, char* input, int* pos);
+void skip_comments(TokList* toks, char* input, int* pos);
+void capture_symbols(TokList* toks, char* input, int* pos);
+void capture_words(TokList* toks, char* input, int* pos);
 
 TokList* input_lex(char* input) {
         // Create an empty list to hold the tokens
@@ -22,7 +21,7 @@ TokList* input_lex(char* input) {
         while (1) {
                 // Exit the loop when the null-terminator or EOF is reached
                 if (!input[pos] || input[pos] == EOF) {
-                        break;
+                        return toks;
                 }
 
                 // Skip whitespace
@@ -40,23 +39,30 @@ TokList* input_lex(char* input) {
                 pos++;
         }
 
-        return toks;
+        return NULL;
 }
 
-void capture_symbol(DList* toks, char* input, int* pos) {}
+void skip_comments(TokList* toks, char* input, int* pos) {
+        // Detect # and skip the rest of the line
+        while(1) {
+
+        }
+}
+
+void capture_symbols(TokList* toks, char* input, int* pos) {}
 
 /* captureWord() helpers -- might be able to combine cleanly... */
-void captureWord_sngQuote(DList* toks, char* input, int* pos);
-void captureWord_dblQuote(DList* toks, char* input, int* pos);
-void captureWord_backQuote(DList* toks, char* input, int* pos);
+void captureWord_sngQuote(TokList* toks, char* input, int* pos);
+void captureWord_dblQuote(TokList* toks, char* input, int* pos);
+void captureWord_backQuote(TokList* toks, char* input, int* pos);
 
-void capture_word(DList* toks, char* input, int* pos) {}
+void capture_word(TokList* toks, char* input, int* pos) {}
 
-void captureWord_sngQuote(DList* toks, char* input, int* pos) {}
+void captureWord_sngQuote(TokList* toks, char* input, int* pos) {}
 
-void captureWord_dblQuote(DList* toks, char* input, int* pos) {}
+void captureWord_dblQuote(TokList* toks, char* input, int* pos) {}
 
-void captureWord_backQuote(DList* toks, char* input, int* pos) {}
+void captureWord_backQuote(TokList* toks, char* input, int* pos) {}
 
 /* TokList methods */
 
