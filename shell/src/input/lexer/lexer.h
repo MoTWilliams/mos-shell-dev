@@ -3,7 +3,7 @@
 
 #include "doublyLinkedList.h"
 
-#define TOKS_TAIL(toks) ((toks)->tokList->tail->data.token->tokText)
+#define TOKS_TAIL(toks) ((toks)->tokList->tail->data.token)
 
 typedef struct TokList {
         // Contents
