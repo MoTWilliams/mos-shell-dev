@@ -5,26 +5,28 @@
 
 #define STR_AT(str, pos) ((str)->text->data[(pos)].chr)
 #define STR_LEN(str) ((str)->text->length)
-#define STR_TEXT(str) (str_getText(str)) // Always free() after use
+#define STR_TEXT(str) (str_getText(str)) /* Always assign to a char* variable */
+                                         /* and free() after use, because */ 
+                                         /* str_getText() mallocs memory */
 
 typedef struct String {
-        // Contents
+        /* Contents */
         Buffer* text;
 
-        // Metadata
+        /* Metadata */
 } String;
 
-// Memory allocation and initialization
-String* str_create();
+/* Memory allocation and initialization */
+String* str_create(void);
 
-// Cleanup
+/* Cleanup */
 void str_destroy(String* str);
 
-// Add a character to the end of the string. Call with src = NULL and 
-// index = -1 to append from stdin. pos is position in the source string
+/* Add a character to the end of the string. Call with src = NULL and */
+/* index = -1 to append from stdin. pos is position in the source string */
 void str_append(String* str, void* src, int pos);
 
-// Retrieve the string's contents - always free() after calling
+/* Retrieve the string's contents - always free() after calling */
 char* str_getText(String* str);
 
 #endif

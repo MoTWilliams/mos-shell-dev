@@ -8,7 +8,7 @@
 // Allocate memory and initialize the buffer's contents and attributes
 Buffer* buff_create(BuffType type) {
         // Allocate space for the buffer and its attributes
-        Buffer* buff = malloc(sizeof(Buffer));
+        Buffer* buff = malloc(sizeof(*buff));
 
         // Exit immediately if memory allocation fails
         // NOTE: Might handle this differently later
@@ -23,7 +23,7 @@ Buffer* buff_create(BuffType type) {
         buff->length = 0;
 
         // Allocate space for the contents
-        buff->data = malloc((buff->capacity + 1) * sizeof(BuffData));
+        buff->data = malloc((buff->capacity + 1) * sizeof(*buff->data));
 
         // Exit immediately if memory allocation fails
         if (!buff->data) {
@@ -62,7 +62,7 @@ void buff_resize(Buffer* buff) {
 
         // Re-allocate memory for the larger contents
         buff->data = realloc(
-                buff->data, (buff->capacity + 1) * sizeof(BuffData)
+                buff->data, (buff->capacity + 1) * sizeof(*buff->data)
         );
 
         // Exit immediately if memory reallocation fails
