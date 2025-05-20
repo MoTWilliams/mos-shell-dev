@@ -21,7 +21,7 @@ String* str_create();
 void str_destroy(String* str);
 
 // Add a character to the end of the string. Call with src = NULL and 
-// index = -1 to append from stdin
+// index = -1 to append from stdin. pos is position in the source string
 void str_append(String* str, void* src, int pos);
 
 // Retrieve the string's contents - always free() after calling

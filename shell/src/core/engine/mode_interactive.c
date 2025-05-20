@@ -1,9 +1,11 @@
 #include "engine.h"
 #include "lexer.h"
-#include "token.h"
+
+#include "token.h"      // I don't think I'll need this later either
 
 #include "moString.h"
-#include "doublyLinkedList.h"
+#include "doublyLinkedList.h"   // For the debug print statement. I don't think 
+                                // I'll need this later...?
 #include "ansi_codes.h"
 
 #include <stdio.h>
@@ -31,11 +33,13 @@ int runShell_interactive() {
                 // Read input from the command line
                 getInput(input);
 
+                // Get the plain c-string from the input String
                 char* inputStr = STR_TEXT(input);
 
                 // PLACEHOLDER: Read back input
                 printf("You entered: %s\n", inputStr);
 
+                // Split the input string into tokens
                 TokList* toks = input_lex(inputStr);
 
                 // PLACEHOLDER: Exit on "exit"
@@ -46,6 +50,7 @@ int runShell_interactive() {
                         return 0;
                 }
 
+                // DEBUG: Print the tokens
                 printf("Tokens: [");
                 DLNode* current = toks->tokList->head;
                 while (current) {
