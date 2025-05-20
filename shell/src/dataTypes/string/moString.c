@@ -31,7 +31,7 @@ void str_destroy(String* str) {
         }
 
         // Free and reset the string's contents
-        free(str->text);
+        buff_destroy(str->text);
         str->text = NULL;
 
         // No metadata to reset

@@ -39,8 +39,10 @@ int runShell_interactive() {
                 TokList* toks = input_lex(inputStr);
 
                 // PLACEHOLDER: Exit on "exit"
-                if (!strcmp(str_getText(input), "exit")) {
+                if (!strcmp(inputStr, "exit")) {
                         free(inputStr);
+                        str_destroy(input);
+                        toks_destroy(toks);
                         return 0;
                 }
 
@@ -55,7 +57,11 @@ int runShell_interactive() {
                 }
                 printf("]\n");
 
+                // Loop cleanup
                 free(inputStr);
+                inputStr = NULL;
+                toks_destroy(toks);
+                toks = NULL;
         }
 
         // Final cleanup

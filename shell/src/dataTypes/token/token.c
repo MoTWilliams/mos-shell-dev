@@ -33,12 +33,12 @@ void token_destroy(Token* tok) {
         }
 
         // Free and reset the token's contents
-        free(tok->tokText);
+        str_destroy(tok->tokText);
         tok->tokText = NULL;
 
         // Free and reset metadata
         tok->tType = TOK_NOTYPE;
-        free(tok->cqTypes);
+        str_destroy(tok->cqTypes);
         tok->cqTypes = NULL;
         tok->untermQ = FALSE;
 
