@@ -1,10 +1,10 @@
 #ifndef ANSI_CODES_H
 #define ANSI_CODES_H
 
-// Turn off all styling
+/* Turn off all styling */
 #define RESET "\033[0m"
 
-// Text styles
+/* Text styles */
 #define BOLD "\033[1m"
 #define DIM "\033[2m"
 #define ITALIC "\033[3m"
@@ -14,7 +14,7 @@
 #define BLINK "\033[5m"
 #define SWAP "\033[7m"
 
-// Turn off text styles
+/* Turn off text styles */
 #define UNBOLD "\033[22m"
 #define UNDIM "\033[22m"
 #define UNITALIC "\033[23m"
@@ -24,8 +24,8 @@
 #define UNBLINK "\033[25m"
 #define UNSWAP "\033[27m"
 
-// Foreground colors
-#define NO_FGC "\033[39m" // Reset to default foreground color
+/* Foreground colors */
+#define NO_FGC "\033[39m" /* Reset to default foreground color */
 #define FG_BLK "\033[30m"
 #define FG_BLK_B "\033[90m"
 #define FG_RED "\033[31m"
@@ -43,8 +43,8 @@
 #define FG_WHT "\033[37m"
 #define FG_WHT_B "\033[97m"
 
-// Background colors
-#define NO_BGC "\033[49m" // Reset to default background color
+/* Background colors */
+#define NO_BGC "\033[49m" /* Reset to default background color */
 #define BG_BLK "\033[40m"
 #define BG_BLK_B "\033[100m"
 #define BG_RED "\033[41m"

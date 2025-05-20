@@ -7,14 +7,14 @@ typedef struct String String;
 
 /* Allowed data types for buffer data */
 
-// Type labels
+/* Type labels */
 typedef enum {
         BUFF_NOTYPE,
         BUFF_CHAR,
         BUFF_STRING
 } BuffType;
 
-// Data object
+/* Data object */
 typedef union {
         char chr;
         String* strPtr;
@@ -32,13 +32,13 @@ typedef struct Buffer {
         int length;
 } Buffer;
 
-// Memory allocation and initialization
+/* Memory allocation and initialization */
 Buffer* buff_create(BuffType type);
 
-// Cleanup
+/* Cleanup */
 void buff_destroy(Buffer* buff);
 
-// Double the capacity
+/* Double the capacity */
 void buff_resize(Buffer* buff);
 
 #endif

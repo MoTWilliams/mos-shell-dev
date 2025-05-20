@@ -1,7 +1,7 @@
-// main loop and command dispatcher
+/* Main loop and command dispatcher */
 #ifndef ENGINE_H
 #define ENGINE_H
 
-int runShell_interactive();
+int runShell_interactive(void);
 
 #endif

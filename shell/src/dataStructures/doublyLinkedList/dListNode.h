@@ -1,14 +1,14 @@
-// Node module for doubly-linked list
+/* Doubly-linked list node module */
 #ifndef D_LIST_NODE_H
 #define D_LIST_NODE_H
 
 /* Forward declarations */
 
-// Base node
+/* Base node */
 struct DLNode;
 typedef struct DLNode DLNode;
 
-// Node types
+/* Node types */
 struct Token;
 typedef struct Token Token;
 
@@ -16,14 +16,14 @@ typedef struct Token Token;
 
 typedef enum {
         NODE_TOKEN
-        // OTHER LABELS
+        /* OTHER LABELS */
 } NodeType;
 
 /* Node data object--variable type */
 
 typedef union {
         Token* token;
-        // Other node types
+        /* Other node types */
 } NodeData;
 
 /* Base node definition */

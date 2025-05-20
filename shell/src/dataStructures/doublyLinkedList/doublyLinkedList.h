@@ -1,4 +1,4 @@
-// A doubly-linked list that can hold data of different types
+/* A doubly-linked list that can hold data of different types */
 #ifndef DOUBLY_LINKED_LIST_H
 #define DOUBLY_LINKED_LIST_H
 
@@ -9,7 +9,7 @@ typedef struct DList {
         DLNode* tail;
 } DList;
 
-DList* dList_create();
+DList* dList_create(void);
 void dList_destroy(DList* list);
 
 void dList_append(DList* list, NodeType type);

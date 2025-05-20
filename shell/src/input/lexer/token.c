@@ -4,64 +4,64 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Token* token_create() {
-        // ALlocate space for the token object
+Token* token_create(void) {
+        // ALlocate space for the token object */
         Token* tok = malloc(sizeof(Token));
 
-        // Exit immediately if allocation fails
+        // Exit immediately if allocation fails */
         if (!tok) {
                 perror("Memory allocation failed");
                 exit(1);
         }
 
-        // Initialize Metadata
+        // Initialize Metadata */
         tok->tType = TOK_NOTYPE;
         tok->cqTypes = str_create();
         tok->untermQ = FALSE;
 
-        // Allocate space for the token's contents
+        // Allocate space for the token's contents */
         tok->tokText = str_create();
 
-        // Return the initialized token
+        // Return the initialized token */
         return tok;
 }
 
 void token_destroy(Token* tok) {
-        // Nothing to do if memory is already free and empty
+        // Nothing to do if memory is already free and empty */
         if (!tok) {
                 return;
         }
 
-        // Free and reset the token's contents
+        // Free and reset the token's contents */
         str_destroy(tok->tokText);
         tok->tokText = NULL;
 
-        // Free and reset metadata
+        // Free and reset metadata */
         tok->tType = TOK_NOTYPE;
         str_destroy(tok->cqTypes);
         tok->cqTypes = NULL;
         tok->untermQ = FALSE;
 
-        // Free the token object
+        // Free the token object */
         free(tok);
 }
 
 void token_appendChar(Token* tok, char* src, int pos, QType qType) {
-        // Add the character to the token's string
+        // Add the character to the token's string */
         str_append(tok->tokText, src, pos);
 
-        // Add context marker to the character contexts string
+        // Add context marker to the character contexts string */
         switch (qType) {
-                case Q_NONE:
+                case Q_NONE: /* not in quotes */
                         str_append(tok->cqTypes, "-", 0);
                         return;
-                case Q_SINGLE:
+                case Q_SINGLE: /* '...' */
                         str_append(tok->cqTypes, "S", 0);
                         return;
-                case Q_DOUBLE:
+                case Q_DOUBLE: /* "..." */
                         str_append(tok->cqTypes, "D", 0);
                         return;
-                case Q_BACKTICK:
+                case Q_BACKTICK: /* `...` */
                         str_append(tok->cqTypes, "B", 0);
                         return;
         }
