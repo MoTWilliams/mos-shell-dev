@@ -25,9 +25,10 @@ typedef enum {
 
 typedef enum {
         Q_NONE,         /* 0: - : not inside quotes */
-        Q_SINGLE,       /* 1: S : inside ' ' */
-        Q_DOUBLE,       /* 2: D : inside " " */
-        Q_BACKTICK      /* 3: B : inside ` ` */
+        Q_SINGLE,       /* 1: S : '...' */
+        Q_DOUBLE,       /* 2: D : "..." */
+        Q_BACKTICK,     /* 3: C : `...` */
+        Q_CMDSUB        /* 4: C : $(...) */
 } QType;
 
 typedef struct Token {
