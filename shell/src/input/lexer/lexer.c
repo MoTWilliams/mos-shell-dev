@@ -170,111 +170,59 @@ void capture_symbolTok(TokList* toks, char* input, int* pos, Bool* inTok) {
 QType wordTok_getCharQType(char* input, int pos);
 
 void capture_wordTok(TokList* toks, char* input, int* pos, Bool* inTok) {
-        QType qContext = Q_NONE;         /* Cursor's quote context */
+        QType qContext = Q_NONE;         /* Is cursor in a quote? */
         
-        /* If not already in a token, create a new token and move in to it */
-        if (!(*inTok)) {
-                toks_addEmptyToken(toks);
-                TOKS_TAIL(toks)->tType = TOK_WORD;
-                *inTok = TRUE;
-        }
+        /* Start a new word token */
+        toks_addEmptyToken(toks);
+        TOKS_TAIL(toks)->tType = TOK_WORD;
+        *inTok = TRUE;
 
-        /* These aren't special tokens. They're just captured as words with
-         * only one character */
-        if (strchr("[]{}", input[*pos])) {
-                TOKS_TAIL(toks)->tType = TOK_WORD;
-                token_appendChar(TOKS_TAIL(toks), input, *pos, Q_NONE);
-                (*pos)++;
-                *inTok = FALSE;
-                return;
-        }
+        /* Loop to end of the input string */
+        while (input[*pos] && input[*pos] != EOF) {
+                /* Store a reference to the current char in the input string 
+                 * and its quote type */
+                char c = input[*pos];
+                QType charQ = wordTok_getCharQType(input, *pos);
 
-        /* Check for opening quote at first character */
-        QType firstCharQType = wordTok_getCharQType(input, *pos);
-        if (IN_QUOTE(firstCharQType)) {
-                qContext = firstCharQType;
-                TOKS_TAIL(toks)->untermQ = TRUE;
-        } else {
-                qContext = Q_NONE;
-        }
-        token_appendChar(TOKS_TAIL(toks), input, *pos, qContext);
-        (*pos)++;
-
-
-        /* Gather characters until a space or special character is reached */
-        while (1) {
-                QType curChrQType = Q_NONE;     /* Quote type of current char */
-                QType nextChrQType = Q_NONE;    /* Quote type of next char */
-
-                /* Exit the loop at end of input string or file */
-                if (!input[*pos] || input[*pos] == EOF) {
+                /* Exit the loop at the end of a word or a special character */
+                if (qContext == Q_NONE &&
+                                (isspace(c) || strchr(";|&<>!()", c))) {
                         break;
                 }
 
-                /* If a non-escaped # is reached outside quotes, treat as 
-                 * comment */
-                if (qContext == Q_NONE && input[*pos] == '#' &&
-                                (*pos == 0 || input[*pos - 1] != '\\')) {
+                /* If non-escaped # is encountered, treat as a comment and skip 
+                 * the rest of the line */
+                if (qContext == Q_NONE && c == '#' &&
+                                (*pos == 0 || input[(*pos) - 1] != '\\')) {
                         *inTok = FALSE;
                         break;
                 }
 
-                /* Exit the loop when an operator or space is reached, if not 
-                 * in a quote */
-                if (qContext == Q_NONE && strchr(";|&<>! ", input[*pos])) {
-                        break;
-                }
-
-                /* Handle escape sequences inside of a word token */
-                if (input[(*pos) + 1] && input[*pos] == '\\') {
-                        escape(toks, input, pos, inTok, qContext);
-                }
-
-                /* If not in a quoted string and the current char is a quote 
-                 * mark, enter the appropriate quote context */
-                curChrQType = wordTok_getCharQType(input, *pos);
-                if (qContext == Q_NONE && IN_QUOTE(curChrQType)) {
-                        qContext = curChrQType;
+                /* Detect (and gather) open quotes */
+                if (qContext == Q_NONE && IN_QUOTE(charQ)) {
+                        qContext = charQ;
                         TOKS_TAIL(toks)->untermQ = TRUE;
-
-                        token_appendChar(
-                                TOKS_TAIL(toks), input, *pos, qContext
-                        );
-
+                        token_appendChar(TOKS_TAIL(toks),input,*pos,qContext);
                         (*pos)++;
                         continue;
                 }
 
-                /* Handle unterminated quotes and context changes while in 
-                 * quoted strings */
-                if (IN_QUOTE(qContext)) {
-                        /* Cursor reaches the end of the input line while 
-                         * inside a quoted string */
-                        if (curChrQType == qContext) {
-                                token_appendChar(
-                                        TOKS_TAIL(toks), input, *pos,qContext
-                                );
-                                qContext = Q_NONE;
-                                TOKS_TAIL(toks)->untermQ = FALSE;
-                                (*pos)++;
-                                continue;
-                        }
-
-                        /* Handle context changes while inside quotes: detect
-                         * closing quotes and change context to next char's 
-                         * qType */
-                        if (curChrQType == qContext) {
-                                token_appendChar(
-                                        TOKS_TAIL(toks),input,*pos,qContext
-                                );
-                                qContext = Q_NONE;
-                                TOKS_TAIL(toks)->untermQ = FALSE;
-                                (*pos)++;  // move past the closing quote
-                                continue;
-                        }
+                /* Detect and handle close quotes */
+                if (IN_QUOTE(qContext) && charQ == qContext) {
+                        token_appendChar(TOKS_TAIL(toks),input,*pos,qContext);
+                        qContext = Q_NONE;
+                        TOKS_TAIL(toks)->untermQ = FALSE;
+                        (*pos)++;
+                        continue;
                 }
 
-                /* AND FINALLY: Add the next char to the current token */
+                /* Handle escape sequence */
+                if (input[*pos] == '\\' && input[(*pos) + 1]) {
+                        escape(toks,input,pos,inTok,qContext);
+                        continue;
+                }
+
+                /* Append regular char to the token's string */
                 token_appendChar(TOKS_TAIL(toks), input, *pos, qContext);
                 (*pos)++;
         }
