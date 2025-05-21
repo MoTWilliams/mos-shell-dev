@@ -1,6 +1,6 @@
 /* Silly text flourishes */
 #include "frivolity.h"
-#include "ansi_codes.h"
+#include "textStylesAndColors.h"
 
 #include <stdio.h>
 #include <unistd.h> /* For usleep() */

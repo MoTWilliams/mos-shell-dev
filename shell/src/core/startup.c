@@ -1,6 +1,6 @@
 #include "report_status.h"
 #include "frivolity.h"
-#include "ansi_codes.h"
+#include "textStylesAndColors.h"
 #include "engine.h"
 
 #include <stdio.h>

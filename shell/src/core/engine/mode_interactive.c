@@ -6,7 +6,7 @@
 #include "moString.h"
 #include "doublyLinkedList.h"   /* For the debug print statement. I don't think 
                                  * I'll need this later either...? */
-#include "ansi_codes.h"
+#include "textStylesAndColors.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -44,6 +44,8 @@ int runShell_interactive(void) {
 
                 /* PLACEHOLDER: Read back input */
                 printf("You entered: %s\n", inputStr);
+
+                /* TODO: History expansion goes here (!! and !something) */
 
                 /* Split the input string into tokens */
                 toks = input_lex(inputStr);
