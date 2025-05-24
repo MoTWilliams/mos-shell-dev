@@ -3,8 +3,9 @@ CC=gcc
 # Find all header files in src/ and its subdirectories. Only include each once.
 INCLUDES = $(shell find src -name '*.h' -exec dirname {} \; | sort -u)
 
-# Turn all includes into -I flags
-CFLAGS = -g $(addprefix -I, $(INCLUDES))
+# Turn all include directories into -I flags.
+# Enforce C89 standard and enable all common warnings.
+CFLAGS = -std=c89 -pedantic -Wall -Wextra -g $(addprefix -I, $(INCLUDES))
 
 # Recursively include all .c files in src/
 SRC = $(wildcard src/*.c src/*/*.c src/*/*/*.c)
