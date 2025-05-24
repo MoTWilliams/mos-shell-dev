@@ -1,7 +1,7 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-// Boolean values
+/* Boolean values */
 typedef enum {
     FALSE,
     TRUE
