@@ -3,7 +3,6 @@
 
 /* Forward-declarations */
 struct String;
-typedef struct String String;
 
 /* Allowed data types for buffer data */
 
@@ -17,16 +16,16 @@ typedef enum {
 /* Data object */
 typedef union {
         char chr;
-        String* strPtr;
+        struct String* strPtr;
 } BuffData;
 
 /* Buffer definition */
 
 typedef struct Buffer {
-        // Contents
+        /* Contents */
         BuffData* data;
 
-        // Metadata
+        /* Metadata */
         BuffType type;
         int capacity;
         int length;
