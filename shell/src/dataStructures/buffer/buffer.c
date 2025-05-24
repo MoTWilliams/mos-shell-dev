@@ -5,67 +5,67 @@
 
 #define INIT_SIZE 32
 
-// Allocate memory and initialize the buffer's contents and attributes
+/* Allocate memory and initialize the buffer's contents and attributes */
 Buffer* buff_create(BuffType type) {
-        // Allocate space for the buffer and its attributes
+        /* Allocate space for the buffer and its attributes */
         Buffer* buff = malloc(sizeof(*buff));
 
-        // Exit immediately if memory allocation fails
-        // NOTE: Might handle this differently later
+        /* Exit immediately if memory allocation fails */
+        /* NOTE: Might handle this differently later */
         if (!buff) {
                 perror("Memory allocation failed");
                 exit(1);
         }
 
-        // Initialize metadata
+        /* Initialize metadata */
         buff->type = type;
         buff->capacity = INIT_SIZE;
         buff->length = 0;
 
-        // Allocate space for the contents
+        /* Allocate space for the contents */
         buff->data = malloc((buff->capacity + 1) * sizeof(*buff->data));
 
-        // Exit immediately if memory allocation fails
+        /* Exit immediately if memory allocation fails */
         if (!buff->data) {
                 perror("Memory allocation failed");
                 exit(1);
         }
 
-        // Return the initialized buffer object
+        /* Return the initialized buffer object */
         return buff;
 }
 
-// Cleanup
+/* Cleanup */
 void buff_destroy(Buffer* buff) {
-        // Nothing to do if memory is already free and empty
+        /* Nothing to do if memory is already free and empty */
         if (!buff) {
                 return;
         }
 
-        // Free and reset the contents
+        /* Free and reset the contents */
         free(buff->data);
         buff->data = NULL;
 
-        // Reset metadata
+        /* Reset metadata */
         buff->type = BUFF_NOTYPE;
         buff->capacity = INIT_SIZE;
         buff->length = 0;
 
-        // Free and reset the buffer
+        /* Free and reset the buffer */
         free(buff);
 }
 
-// Double the capacity of the buffer
+/* Double the capacity of the buffer */
 void buff_resize(Buffer* buff) {
-        // Double capacity metadata value
+        /* Double capacity metadata value */
         buff->capacity *= 2;
 
-        // Re-allocate memory for the larger contents
+        /* Re-allocate memory for the larger contents */
         buff->data = realloc(
                 buff->data, (buff->capacity + 1) * sizeof(*buff->data)
         );
 
-        // Exit immediately if memory reallocation fails
+        /* Exit immediately if memory reallocation fails */
         if (!buff->data) {
                 perror("Memory re-allocation failed");
                 exit(1);

@@ -1,10 +1,11 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
+#include "moString.h"
 #include "constants.h"  /* For Boolean values */
 
-struct String;
-typedef struct String String;
+struct Token;
+typedef struct Token Token;
 
 typedef enum {
         TOK_NOTYPE,     /* 0 */
@@ -20,17 +21,17 @@ typedef enum {
         TOK_REDIR_OUT,  /* 10: > */
         TOK_APPEND,     /* 11: >> */
         TOK_PAREN_L,    /* 12: ( */
-        TOK_PAREN_R,    /* 13: ) */
+        TOK_PAREN_R     /* 13: ) */
 } TokType;
 
 typedef enum {
         Q_NONE,         /* 0: - : not inside quotes */
-        Q_SINGLE,       /* 1: S : inside ' ' */
-        Q_DOUBLE,       /* 2: D : inside " " */
-        Q_BACKTICK      /* 3: B : inside ` ` */
+        Q_SINGLE,       /* 1: S : '...' */
+        Q_DOUBLE,       /* 2: D : "..." */
+        Q_CMDSUB        /* 4: C : `...` and $(...) */
 } QType;
 
-typedef struct Token {
+struct Token {
         /* Contents */
         String* tokText;
 
@@ -38,7 +39,7 @@ typedef struct Token {
         TokType tType;
         String* cqTypes; /* Contexts for each char in tokText */
         Bool untermQ;
-} Token;
+};
 
 Token* token_create(void);
 void token_destroy(Token* tok);

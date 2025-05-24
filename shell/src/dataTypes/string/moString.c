@@ -102,7 +102,8 @@ char* str_getText(String* str) {
         char* out = malloc((STR_LEN(str) + 1) * sizeof(*out));
 
         /* Copy the contents of the String into a regular character array */
-        for (int i = 0; i < STR_LEN(str); i++) {
+        int i;  /* Must be declared at the top of the function for C89 */
+        for (i = 0; i < STR_LEN(str); i++) {
                 out[i] = STR_AT(str, i);
         }
 

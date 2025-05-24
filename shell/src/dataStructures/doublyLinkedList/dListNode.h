@@ -10,7 +10,6 @@ typedef struct DLNode DLNode;
 
 /* Node types */
 struct Token;
-typedef struct Token Token;
 
 /* Node type labels */
 
@@ -22,7 +21,7 @@ typedef enum {
 /* Node data object--variable type */
 
 typedef union {
-        Token* token;
+        struct Token* token;
         /* Other node types */
 } NodeData;
 
@@ -35,7 +34,7 @@ struct DLNode {
         DLNode* prev;
 };
 
-DLNode* dNode_create(NodeType type);
+struct DLNode* dNode_create(NodeType type);
 void dNode_destroy(DLNode* node);
 
 #endif
