@@ -7,10 +7,10 @@
 #include "doublyLinkedList.h"   /* For the debug print statement. I don't think 
                                  * I'll need this later either...? */
 #include "textStylesAndColors.h"
+#include "mem.h"
 
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 
 static void cmdPrompt(void);
 static void getInput(String* input);
@@ -52,17 +52,16 @@ int runShell_interactive(void) {
 
                 /* PLACEHOLDER: Exit on "exit" */
                 if (!strcmp(inputStr, "exit")) {
-                        free(inputStr);
-                        str_destroy(input);
+                        moFree(inputStr);
                         toks_destroy(toks);
-                        return 0;
+                        break;
                 }
 
                 /* DEBUG: Print the tokens */
                 toks_print(toks);
 
                 /* Loop cleanup */
-                free(inputStr);
+                moFree(inputStr);
                 inputStr = NULL;
                 toks_destroy(toks);
                 toks = NULL;
