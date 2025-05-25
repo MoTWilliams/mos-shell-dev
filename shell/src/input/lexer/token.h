@@ -7,23 +7,27 @@
 struct Token;
 typedef struct Token Token;
 
+/* Token type labels */
 typedef enum {
         TOK_NOTYPE,     /* 0 */
         TOK_WORD,       /* 1 */
         TOK_SEQ,        /* 2: ; (sequence) */
-        TOK_PIPE,       /* 3: | */
-        TOK_OR,         /* 4: || */
-        TOK_BG,         /* 5: & (background) */
-        TOK_AND,        /* 6: && */
-        TOK_NOT,        /* 7: ! */
-        TOK_REDIR_IN,   /* 8: < */
-        TOK_HEREDOC,    /* 9: << */
-        TOK_REDIR_OUT,  /* 10: > */
-        TOK_APPEND,     /* 11: >> */
-        TOK_PAREN_L,    /* 12: ( */
-        TOK_PAREN_R     /* 13: ) */
+        TOK_CASE_END,   /* 3: ;; (used in switch/case statements) */
+        TOK_PIPE,       /* 4: | */
+        TOK_OR,         /* 5: || */
+        TOK_BG,         /* 6: & (background) */
+        TOK_AND,        /* 7: && */
+        TOK_NOT,        /* 8: ! */
+        TOK_REDIR_IN,   /* 9: < */
+        TOK_HEREDOC,    /* 10: << */
+        TOK_HERE_STRIP, /* 11: <<- (heredoc with tab stripping) */
+        TOK_REDIR_OUT,  /* 11: > */
+        TOK_APPEND,     /* 12: >> */
+        TOK_PAREN_L,    /* 13: ( */
+        TOK_PAREN_R     /* 14: ) */
 } TokType;
 
+/* Quote context labels */
 typedef enum {
         Q_NONE,         /* 0: - : not inside quotes */
         Q_SINGLE,       /* 1: S : '...' */
@@ -31,12 +35,38 @@ typedef enum {
         Q_CMDSUB        /* 4: C : `...` and $(...) */
 } QType;
 
+/* Keyword/reserved word labels */
+typedef enum {
+        /* Not a keyword */
+        KEY_NOTYPE,
+        
+        /* Control flow: if-statements */
+        KEY_IF,
+        KEY_THEN,
+        KEY_ELSE,
+        KEY_ELIF,
+        KEY_FI,
+
+        /* Control flow: loops */
+        KEY_FOR,
+        KEY_IN,
+        KEY_WHILE,
+        KEY_UNTIL,
+        KEY_DO,
+        KEY_DONE,
+
+        /* Switch/case statements */
+        KEY_CASE,
+        KEY_ESAC
+} Keyword;
+
 struct Token {
         /* Contents */
         String* tokText;
 
         /* Metadata */
         TokType tType;
+        Keyword kType;
         String* cqTypes; /* Contexts for each char in tokText */
         Bool untermQ;
 };
