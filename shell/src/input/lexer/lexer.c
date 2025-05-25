@@ -1,11 +1,11 @@
 #include "lexer.h"
 #include "token.h"
 #include "moString.h"
-#include "constants.h"
+#include "mem.h"
+#include "constants.h"  /* For Boolean values */
 #include "report_status.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdio.h>      /* For EOF */
 #include <string.h>
 #include <ctype.h>
 
@@ -45,11 +45,6 @@ TokList* input_lex(char* input) {
                 capture_wordTok(toks, input, &pos, &inTok);
         }
 
-        /* Show error message if input ends with an unterminated quote */
-        if (TOKS_TAIL(toks)->untermQ) {
-                msg_input_error("Unterminated quote");
-        }
-
         return toks;
 }
 
@@ -65,9 +60,35 @@ void capture_symbolTok(TokList* toks, char* input, int* pos, Bool* inTok) {
         /* Build special symbol tokens */
         switch (input[*pos]) {
                 case ';':
+                        /* ;; */
+                        if (input[(*pos)+1] && input[*pos] == input[(*pos)+1]) {
+                                /* Append the second ; */
+                                token_appendChar(
+                                        TOKS_TAIL(toks), input, 
+                                        (*pos) + 1, Q_NONE
+                                );
+                                /* Set the type */
+                                TOKS_TAIL(toks)->tType = TOK_CASE_END;
+                                (*pos)++;
+                                break;
+                        }
+                        /* Otherwise, it's just ; */
                         TOKS_TAIL(toks)->tType = TOK_SEQ;
                         break;
                 case '|':
+                        /* || */
+                        if (input[(*pos)+1] && input[*pos] == input[(*pos)+1]) {
+                                /* Append the second | */
+                                token_appendChar(
+                                        TOKS_TAIL(toks), input, 
+                                        (*pos) + 1, Q_NONE
+                                );
+                                /* Set the type */
+                                TOKS_TAIL(toks)->tType = TOK_OR;
+                                (*pos)++;
+                                break;
+                        }
+                        /* Otherwise, it's just | */
                         TOKS_TAIL(toks)->tType = TOK_PIPE;
                         break;
                 case '&':
@@ -97,6 +118,18 @@ void capture_symbolTok(TokList* toks, char* input, int* pos, Bool* inTok) {
                                         TOKS_TAIL(toks), input, 
                                         (*pos) + 1, Q_NONE
                                 );
+
+                                /* Check for heredoc with tab stripping <<- */
+                                if (input[(*pos)+2] && input[(*pos)+2]=='-') {
+                                        token_appendChar(
+                                                TOKS_TAIL(toks), input, 
+                                                (*pos) + 2, Q_NONE
+                                        );
+                                        TOKS_TAIL(toks)->tType = TOK_HERE_STRIP;
+                                        (*pos) += 2;
+                                        break;
+                                }
+
                                 /* Set the type */
                                 TOKS_TAIL(toks)->tType = TOK_HEREDOC;
                                 (*pos)++;
@@ -131,6 +164,9 @@ void capture_symbolTok(TokList* toks, char* input, int* pos, Bool* inTok) {
                         break;
         }
 
+        /* No need to set kType--it is already initialized to KEY_NONE, and 
+         * symbols are not keywords */
+
         /* Leave the token */
         (*pos)++;
         *inTok = FALSE;
@@ -142,6 +178,7 @@ void wordTok_captureRecursiveCmdSub(
         TokList* toks, char* input, int* pos, QType* qContext);
 void wordTok_escape(
         TokList* toks,char* input,int* pos,Bool* inTok,QType qContext);
+Keyword wordTok_setKType(Token* tok);
 
 void capture_wordTok(TokList* toks, char* input, int* pos, Bool* inTok) {
         QType qContext = Q_NONE;         /* Is cursor in a quote? */
@@ -209,6 +246,9 @@ void capture_wordTok(TokList* toks, char* input, int* pos, Bool* inTok) {
                 token_appendChar(TOKS_TAIL(toks), input, *pos, qContext);
                 (*pos)++;
         }
+
+        /* Is the token a reserved word? */
+        TOKS_TAIL(toks)->kType = wordTok_setKType(TOKS_TAIL(toks)); /* this line */
 
         /* Move out of the token */
         *inTok = FALSE;
@@ -294,17 +334,41 @@ void wordTok_escape(
         (*pos) += 2;
 }
 
+Keyword wordTok_setKType(Token* tok) {
+        /* To avoid having to call free() repeatedly, we will just create the 
+         * c-string from the token, set the value of this kType with a series 
+         * of if-statements, destroy tht c-string, and return the set value. */
+        Keyword kType = KEY_NOTYPE;
+        char* tokStr = STR_TEXT(tok->tokText);
+
+        /* Control flow: if-statements */
+        if (!strcmp(tokStr, "if")) kType = KEY_IF;
+        if (!strcmp(tokStr, "then")) kType = KEY_THEN;
+        if (!strcmp(tokStr, "else")) kType = KEY_ELSE;
+        if (!strcmp(tokStr, "elif")) kType = KEY_ELIF;
+        if (!strcmp(tokStr, "fi")) kType = KEY_FI;
+
+        /* Control flow: loops */
+        if (!strcmp(tokStr, "for")) kType = KEY_FOR;
+        if (!strcmp(tokStr, "in")) kType = KEY_IN;
+        if (!strcmp(tokStr, "while")) kType = KEY_WHILE;
+        if (!strcmp(tokStr, "until")) kType = KEY_UNTIL;
+        if (!strcmp(tokStr, "do")) kType = KEY_DO;
+        if (!strcmp(tokStr, "done")) kType = KEY_DONE;
+        
+        /* Switch/case statements */
+        if (!strcmp(tokStr, "case")) kType = KEY_CASE;
+        if (!strcmp(tokStr, "esac")) kType = KEY_ESAC;
+
+        free(tokStr);
+        return kType;
+}
+
 /* TokList methods */
 
 TokList* toks_create(void) {
         /* Allocate space for the token list object */
-        TokList* toks = malloc(sizeof(*toks));
-
-        /* Exit immediately if allocation fails */
-        if (!toks) {
-                perror("Memory allocation failed");
-                exit(1);
-        }
+        TokList* toks = moMalloc(sizeof(*toks));
 
         /* No metadata to initialize */
 
@@ -316,7 +380,9 @@ TokList* toks_create(void) {
 }
 
 void toks_destroy(TokList* toks) {
-        /* Nothing to do if memory is already free and empty */
+        /* If toks is already free and NULL, attempting to destroy the list 
+         * inside will cause a segfault, so we'll just return without doing 
+         * anything instead */
         if (!toks) {
                 return;
         }
@@ -327,19 +393,20 @@ void toks_destroy(TokList* toks) {
         /* No metadata to reset */
 
         /* Free token list object */
-        free(toks);
+        moFree(toks);
 }
 
 void toks_addEmptyToken(TokList* toks) {
         dList_append(toks->tokList, NODE_TOKEN);
 }
 
+/* For debugging */
 void toks_print(TokList* toks) {
         DLNode* current = NULL; /* Reference to the current token */
 
         /* Handle empty input */
         if (!toks || !toks->tokList || !toks->tokList->head) {
-                printf("Tokens: []\nqTypes: []\n");
+                printf("Input empty. No tokens.\n");
                 return;
         }
 
@@ -369,9 +436,81 @@ void toks_print(TokList* toks) {
                         printf(", ");
                 }
 
-                free(types);
+                moFree(types);
 
                 current = current->next;
         }
         printf("]\n");
+
+        /* Print token types */
+        current = toks->tokList->head;
+        printf("Token types: [");
+        while (current) {
+                switch (current->data.token->tType) {
+                        case TOK_WORD: printf("TOK_WORD"); break;
+                        case TOK_SEQ: printf("TOK_SEQ"); break;
+                        case TOK_CASE_END: printf("TOK_CASE_END"); break;
+                        case TOK_PIPE: printf("TOK_PIPE"); break;
+                        case TOK_OR: printf("TOK_OR"); break;
+                        case TOK_BG: printf("TOK_BG"); break;
+                        case TOK_AND: printf("TOK_AND"); break;
+                        case TOK_NOT: printf("TOK_NOT"); break;
+                        case TOK_REDIR_IN: printf("TOK_REDIR_IN"); break;
+                        case TOK_HEREDOC: printf("TOK_HEREDOC"); break;
+                        case TOK_HERE_STRIP: printf("TOK_HERE_STRIP"); break;
+                        case TOK_REDIR_OUT: printf("TOK_REDIR_OUT"); break;
+                        case TOK_APPEND: printf("TOK_APPEND"); break;
+                        case TOK_PAREN_L: printf("TOK_PAREN_L"); break;
+                        case TOK_PAREN_R: printf("TOK_PAREN_R"); break;
+                        default: printf("No token type"); break;
+                }
+
+                if (current->next) {
+                        printf(", ");
+                }
+                
+                current = current->next;
+        }
+        printf("]\n");
+
+        /* Print keyword types */
+        current = toks->tokList->head;
+        printf("Keyword types: [");
+        while (current) {
+                switch (current->data.token->kType) {
+                        /* If-statements */
+                        case KEY_IF: printf("KEY_IF"); break;
+                        case KEY_THEN: printf("KEY_THEN"); break;
+                        case KEY_ELSE: printf("KEY_ELSE"); break;
+                        case KEY_ELIF: printf("KEY_ELIF"); break;
+                        case KEY_FI: printf("KEY_FI"); break;
+
+                        /* Loops */
+                        case KEY_FOR: printf("KEY_FOR"); break;
+                        case KEY_IN: printf("KEY_IN"); break;
+                        case KEY_WHILE: printf("KEY_WHILE"); break;
+                        case KEY_UNTIL: printf("KEY_UNTIL"); break;
+                        case KEY_DO: printf("KEY_DO"); break;
+                        case KEY_DONE: printf("KEY_DONE"); break;
+
+                        /* Switch/case statements */
+                        case KEY_CASE: printf("KEY_CASE"); break;
+                        case KEY_ESAC: printf("KEY_ESAC"); break;
+
+                        /* Not a keyword or error */
+                        default: printf("Not a keyword"); break;
+                }
+
+                if (current->next) {
+                        printf(", ");
+                }
+
+                current = current->next;
+        }
+        printf("]\n");
+
+        /* Say something, if the line ends with an unterminated quote string */
+        if (TOKS_TAIL(toks)->untermQ) {
+                msg_input_error("Unterminated quote");
+        }
 }
