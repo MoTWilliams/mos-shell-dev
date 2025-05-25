@@ -1,17 +1,9 @@
 #include "doublyLinkedList.h"
-
-#include <stdio.h>
-#include <stdlib.h>
+#include "mem.h"
 
 DList* dList_create(void) {
         /* Allocate memory for the list */
-        DList* list = malloc(sizeof(*list));
-
-        /* Exit immediately if allocation fails */
-        if (!list) {
-                perror("Memory allocation failed");
-                exit(1);
-        }
+        DList* list = moMalloc(sizeof(*list));
 
         /* Initialize the empty list's pointers */
         list->head = NULL;
@@ -22,13 +14,16 @@ DList* dList_create(void) {
 }
 
 void dList_destroy(DList* list) {
-        /* Store a reference to the current node */
-        DLNode* current = list->head;
+        DLNode* current = NULL; /* Will hold a reference to the current node */
 
-        /* Nothing to do if the list is already free and empty */
+        /* If NULL is passed into dList_destroy, attempting to assign current  
+         * to the head of the list will segfault, so we'll just exit early */
         if (!list) {
                 return;
         }
+
+        /* Grab the current node */
+        current = list->head;
 
         /* Destroy all nodes of the list first */
         while (current) {
@@ -43,7 +38,7 @@ void dList_destroy(DList* list) {
         }
 
         /* Then destroy the list */
-        free(list);
+        moFree(list);
 }
 
 void dList_append(DList* list, NodeType type) {

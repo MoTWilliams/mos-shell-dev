@@ -1,21 +1,17 @@
 #include "token.h"
 #include "moString.h"
+#include "mem.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
 Token* token_create(void) {
         /* ALlocate space for the token object */
-        Token* tok = malloc(sizeof(Token));
-
-        /* Exit immediately if allocation fails */
-        if (!tok) {
-                perror("Memory allocation failed");
-                exit(1);
-        }
+        Token* tok = moMalloc(sizeof(*tok));
 
         /* Initialize Metadata */
         tok->tType = TOK_NOTYPE;
+        tok->kType = KEY_NOTYPE;
         tok->cqTypes = str_create();
         tok->untermQ = FALSE;
 
@@ -27,7 +23,9 @@ Token* token_create(void) {
 }
 
 void token_destroy(Token* tok) {
-        /* Nothing to do if memory is already free and empty */
+        /* If tok is already free and NULL, attempting to destroy the strings 
+         * inside will cause a segfault, so we'll just return without doing 
+         * anything instead */
         if (!tok) {
                 return;
         }
@@ -38,12 +36,13 @@ void token_destroy(Token* tok) {
 
         /* Free and reset metadata */
         tok->tType = TOK_NOTYPE;
+        tok->kType = KEY_NOTYPE;
         str_destroy(tok->cqTypes);
         tok->cqTypes = NULL;
         tok->untermQ = FALSE;
 
         /* Free the token object */
-        free(tok);
+        moFree(tok);
 }
 
 void token_appendChar(Token* tok, char* src, int pos, QType qType) {
@@ -72,5 +71,5 @@ void token_print(Token* tok) {
 
         printf("%s", tokTextPlain);
 
-        free(tokTextPlain);
+        moFree(tokTextPlain);
 }

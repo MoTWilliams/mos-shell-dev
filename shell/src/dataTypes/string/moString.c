@@ -1,18 +1,12 @@
 #include "moString.h"
+#include "mem.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdio.h> /* For getchar()*/
 
 /* Allocate memory and initialize the string's contents and metadata */
 String* str_create(void) {
         /* Allocate space for the string object */
-        String* str = malloc(sizeof(*str));
-
-        /* Exit immediately if memory allocation fails */
-        if (!str) {
-                perror("Memory allocation failed");
-                exit(1);
-        }
+        String* str = moMalloc(sizeof(*str));
 
         /* TODO: initialize metadata, when/if it exists */
 
@@ -25,11 +19,6 @@ String* str_create(void) {
 
 /* Cleanup */
 void str_destroy(String* str) {
-        /* Nothing to do if memory is already free and empty */
-        if (!str) {
-                return;
-        }
-
         /* Free and reset the string's contents */
         buff_destroy(str->text);
         str->text = NULL;
@@ -37,7 +26,7 @@ void str_destroy(String* str) {
         /* No metadata to reset */
 
         /* Free and reset the string object */
-        free(str);
+        moFree(str);
 }
 
 /* Append helper */
@@ -56,9 +45,6 @@ void str_append(String* str, void* src, int pos) {
 
         /* Adjust the length of the string accordingly */
         STR_LEN(str)++;
-
-        /* Adjust the null-terminator */
-        STR_AT(str, STR_LEN(str)) = '\0';
 }
 
 /* getNetChar() helpers */
@@ -98,17 +84,15 @@ static char getCharFrom_string(char* src, int index) {
 
 /* Retrieve the string's text. Don't forget to free() after use */
 char* str_getText(String* str) {
-        /* Allocate space for the c-string */
-        char* out = malloc((STR_LEN(str) + 1) * sizeof(*out));
+        /* Allocate space for the c-string. +1 to ensure space for the 
+         * null-terminator */
+        char* out = moCalloc(STR_LEN(str) + 1, sizeof(*out));
 
         /* Copy the contents of the String into a regular character array */
         int i;  /* Must be declared at the top of the function for C89 */
         for (i = 0; i < STR_LEN(str); i++) {
                 out[i] = STR_AT(str, i);
         }
-
-        /* Null-terminate */
-        out[STR_LEN(str)] = '\0';
 
         /* Return the plain char array */
         return out;
