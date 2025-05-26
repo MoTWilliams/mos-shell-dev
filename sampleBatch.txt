@@ -1,0 +1,23 @@
+# Sample batch script for Mo's Shell
+
+echo "Starting script..." && \
+if echo "checking conditions"; then
+    echo "Condition met" > output.txt; cat output.txt
+else
+    echo "Condition failed" >> output.txt
+fi
+
+for item in one two three; do
+    echo "Item: $item"
+done
+
+# Demonstrating command substitution
+echo "Today is: $(date)"
+
+# Redirection and background execution
+sleep 1 & echo "Background task started"
+
+# Escaped newline with &&
+mkdir testdir && \
+cd testdir && \
+echo "Inside testdir" > info.txt
