@@ -1,36 +1,35 @@
+#include "engine.h"
+#include "input.h" /* For InputMode */
+
 #include "report_status.h"
 #include "textStylesAndColors.h"
-#include "engine.h"
 
 #include <stdio.h>
-#include <string.h>
+
 
 int main(int argc, char* argv[]) {
-        /* Startup command only has one optional argument */
+        /* Default (i.e., no arguments) mode is interactive */
+        InputMode mode = MODE_INTERACTIVE;
+
+        /* Startup command only has one optional additional argument. more than 
+         * 2 total arguments is too many. */
         if (argc > 2) {
                 msg_input_error("too many arguments");
                 return 1;
         }
 
+        /* Welcome message */
         printf(FG_BLU_B BOLD "\nWelcome to Mo's Shell!\n\n" RESET);
 
-        /* Start in batch mode */
+        /* If the optional argument is present, set mode to MODE_BATCH */
         if (argv[1]) {
-                printf(
-                        "%s[--BATCH MODE UNDER CONSTRUCTION--]%s\n", 
-                        BG_RED, NO_BGC
-                );
-        /* Start in interactive mode */
-        } else {
-                printf(FG_BLU_B "Entering interactive input mode..." RESET);
-                printf("\n");
-
-                runShell_interactive();
-
-                printf(FG_BLU_B "Exiting interactive input mode..." RESET);
-                printf("\n");
+                mode = MODE_BATCH;
         }
 
+        /* Run the shell in the appropriate mode. argv[] is automatically NULL-terminated, so passing in the second argument is always safe. */
+        runShell(mode, argv[1]);
+
+        /* You'll only see this if all else goes how it should. */
         printf(RESET "\nGoodbye!\n\n");
 
         return 0;

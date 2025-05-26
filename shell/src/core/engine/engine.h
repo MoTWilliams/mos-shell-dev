@@ -2,6 +2,10 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
-int runShell_interactive(void);
+#include "input.h"
+
+/* Updated functions. Am currently writing. */
+void runShell(InputMode mode, char* srcPath);
+
 
 #endif
