@@ -65,6 +65,10 @@ struct Token {
         String* tokText;
 
         /* Metadata */
+        int lineNo; /* Used in batch input mode, mostly. In interactive mode, 
+        * lineNo will only ever be 1. This could eventually become a Range 
+        * struct, consisting of beginning and ending Position structs, which 
+        * are, in turn, made of ints for line and column. */
         TokType tType;
         Keyword kType;
         String* cqTypes; /* Contexts for each char in tokText */
