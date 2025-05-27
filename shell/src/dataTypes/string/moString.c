@@ -11,7 +11,7 @@ String* str_create(void) {
         /* TODO: initialize metadata, when/if it exists */
 
         /* Allocate space for the string's contents */
-        str->text = buff_create(BUFF_CHAR);
+        str->buff = buff_create(BUFF_CHAR);
 
         /* Return the initialized String */
         return str;
@@ -20,8 +20,8 @@ String* str_create(void) {
 /* Cleanup */
 void str_destroy(String* str) {
         /* Free and reset the string's contents */
-        buff_destroy(str->text);
-        str->text = NULL;
+        buff_destroy(str->buff);
+        str->buff = NULL;
 
         /* No metadata to reset */
 
@@ -34,28 +34,36 @@ static char getNextChar(void* src, int index);
 
 /* Add a character to the end of the string. Call with src = NULL and index = 
  * -1 to append from stdin */
-void str_append(String* str, void* src, int pos) {
+char str_append(String* str, void* src, int pos) {
+        char c = '-';   /* The character to append */
+        
         /* Resize the string's buffer, if necessary */
-        if (STR_LEN(str) == str->text->capacity) {
-                buff_resize(str->text);
+        if (STR_LEN(str) == str->buff->capacity) {
+                buff_resize(str->buff);
         }
 
+        /* Grab the next character */
+        c = getNextChar(src, pos);
+
         /* Add the next character to the string */
-        STR_AT(str, STR_LEN(str)) = getNextChar(src, pos);
+        STR_AT(str, STR_LEN(str)) = c;
 
         /* Adjust the length of the string accordingly */
         STR_LEN(str)++;
+
+        /* Return the char that was appended */
+        return c;
 }
 
 /* getNetChar() helpers */
-static char getCharFrom_stream(void* src);
+static char getCharFrom_stream(FILE* src);
 static char getCharFrom_string(char* src, int index);
 
 /* Append helper: Call the appropriate getChar function */
 static char getNextChar(void* src, int index) {
         /* If a negative index is given, get the next character from stdin */
         if (index < 0) {
-                return getCharFrom_stream(src);
+                return getCharFrom_stream((FILE*) src);
         
         /* Otherwise, get the character from the indicated index in the
          * string */
@@ -65,16 +73,15 @@ static char getNextChar(void* src, int index) {
 }
 
 /* getNextChar() helper */
-static char getCharFrom_stream(void* src) {
-        /* If no input stream specified (src = NULL), get character from
-         * stdin. */ 
+static char getCharFrom_stream(FILE* src) {
+        /* If no input stream specified (src = NULL), get next character from
+         * stdin. (Raw terminal later) */ 
         if (!src) {
                 return getchar();
         }
 
-        /* Otherwise, get input from raw terminal */
-        /* TODO (big): Implement raw input mode */
-        return '\0';
+        /* Otherwise, get next character from the file */
+        return fgetc(src);
 }
 
 /* getNextChar() helper */

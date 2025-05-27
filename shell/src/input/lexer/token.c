@@ -10,6 +10,7 @@ Token* token_create(void) {
         Token* tok = moMalloc(sizeof(*tok));
 
         /* Initialize Metadata */
+        tok->lineNo = 0;
         tok->tType = TOK_NOTYPE;
         tok->kType = KEY_NOTYPE;
         tok->cqTypes = str_create();
@@ -35,6 +36,7 @@ void token_destroy(Token* tok) {
         tok->tokText = NULL;
 
         /* Free and reset metadata */
+        tok->lineNo = 0;
         tok->tType = TOK_NOTYPE;
         tok->kType = KEY_NOTYPE;
         str_destroy(tok->cqTypes);
