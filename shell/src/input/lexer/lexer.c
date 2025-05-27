@@ -1,5 +1,6 @@
-#include "lexer.h"
-#include "token.h"
+#include "input.h"
+#include "tokenList.h"
+
 #include "moString.h"
 #include "mem.h"
 #include "constants.h"  /* For Boolean values */
@@ -13,42 +14,75 @@
                                  (qContext) == Q_DOUBLE || \
                                  (qContext) == Q_CMDSUB)
 
-
-void capture_symbolTok(TokList* toks, char* input, int* pos, Bool* inTok);
-void capture_wordTok(TokList* toks, char* input, int* pos, Bool* inTok);
+static void handle_comments(char* input, int* pos, int* curLineNo);
+static void tokenize_symbolTok(
+        TokList* toks, char* input, int* pos, Bool* inTok, int* curLineNo);
+static void tokenize_wordTok(
+        TokList* toks, char* input, int* pos, Bool* inTok, int* curLineNo);
 
 TokList* input_lex(char* input) {
-        /* Create an empty list to hold the tokens */
-        TokList* toks = toks_create();
-
-        /* Cursor context */
-        Bool inTok = FALSE;
+        TokList* toks = toks_create();  /* Empty list to hold the tokens */
+        Bool inTok = FALSE;             /* Cursor context */
+        int pos = 0;                    /* Position in the input string */
+        int curLineNo = 1;              /* Line counter */
 
         /* Split the input string into tokens */
-        int pos = 0;
-
         while (input[pos] && input[pos] != EOF) {
-                /* Skip whitespace */
+                /* Increment line count on un-escaped newline. This will only 
+                 * fire in batch mode--newline signals end of input in 
+                 * interactive mode */
+                if (input[pos] == '\n') {
+                        curLineNo++;
+                        pos++;
+                        continue;
+                }
+                
+                /* Skip other whitespace entirely */
                 if (isspace(input[pos])) {
                         pos++;
                         continue;
                 }
 
-                /* Capture operators (;,|,||,&,&&,<,<<,>,>>) and other
+                if (input[pos] == '#') {
+                        handle_comments(input, &pos, &curLineNo);
+                        continue;
+                }
+
+                /* Tokenize operators (;,|,||,&,&&,<,<<,>,>>) and other
                  * symbols  (!,(),[],{}) */
                 if (strchr(";|&<>!()", input[pos])) {
-                        capture_symbolTok(toks, input, &pos, &inTok);
+                        tokenize_symbolTok(
+                                toks, input, &pos, &inTok, &curLineNo
+                        );
                         continue;
                 }
 
                 /* Everything else is a word */
-                capture_wordTok(toks, input, &pos, &inTok);
+                tokenize_wordTok(toks, input, &pos, &inTok, &curLineNo);
         }
 
         return toks;
 }
 
-void capture_symbolTok(TokList* toks, char* input, int* pos, Bool* inTok) {
+static void handle_comments(char* input, int* pos, int* curLineNo) {
+        char c = input[*pos];  /* Prime with the # */
+
+        /* Skip characters until a newline or EOF is reached */
+        while (c != '\n' && c != EOF) {
+                /* Advance the cursor */
+                (*pos)++;
+
+                /* Look at the current char */
+                c = input[*pos];
+        }
+
+        (*curLineNo)++;
+        (*pos)++;
+}
+
+static void tokenize_symbolTok(
+                TokList* toks, char* input, int* pos, 
+                Bool* inTok, int* curLineNo) {
         /* Always start a new token, if any of these chars are detected */
         /* outside of a quoted string */
         toks_addEmptyToken(toks);
@@ -164,8 +198,7 @@ void capture_symbolTok(TokList* toks, char* input, int* pos, Bool* inTok) {
                         break;
         }
 
-        /* No need to set kType--it is already initialized to KEY_NONE, and 
-         * symbols are not keywords */
+        TOKS_TAIL(toks)->lineNo = *curLineNo;
 
         /* Leave the token */
         (*pos)++;
@@ -173,23 +206,28 @@ void capture_symbolTok(TokList* toks, char* input, int* pos, Bool* inTok) {
 }
 
 /* Word token helpers */
-QType wordTok_getCharQType(char* input, int pos);
-void wordTok_captureRecursiveCmdSub(
+static QType wordTok_getCharQType(char* input, int pos);
+/*static void wordTok_skipComment(
+        char* input, int* pos, Bool* inTok, int* curLineNo);*/
+static void wordTok_tokenizeRecursiveCmdSub(
         TokList* toks, char* input, int* pos, QType* qContext);
-void wordTok_escape(
+static void wordTok_escape(
         TokList* toks,char* input,int* pos,Bool* inTok,QType qContext);
-Keyword wordTok_setKType(Token* tok);
+static Keyword wordTok_setKType(Token* tok);
 
-void capture_wordTok(TokList* toks, char* input, int* pos, Bool* inTok) {
+static void tokenize_wordTok(
+                TokList* toks, char* input, int* pos,
+                Bool* inTok, int* curLineNo) {
         QType qContext = Q_NONE;         /* Is cursor in a quote? */
         
         /* Start a new word token */
         toks_addEmptyToken(toks);
         TOKS_TAIL(toks)->tType = TOK_WORD;
+        TOKS_TAIL(toks)->lineNo = *curLineNo;
         *inTok = TRUE;
 
         /* Loop to end of the input string */
-        while (input[*pos] && input[*pos] != EOF) {
+        while (input[*pos] && input[*pos] != EOF) { 
                 /* Store a reference to the current char in the input string 
                  * and its quote type */
                 char c = input[*pos];
@@ -201,18 +239,10 @@ void capture_wordTok(TokList* toks, char* input, int* pos, Bool* inTok) {
                         break;
                 }
 
-                /* If non-escaped # is encountered, treat as a comment and skip 
-                 * the rest of the line */
-                if (qContext == Q_NONE && c == '#' &&
-                                (*pos == 0 || input[(*pos) - 1] != '\\')) {
-                        *inTok = FALSE;
-                        break;
-                }
-
                 /* Handle command substitution $(...) */
                 if (qContext == Q_NONE && input[(*pos) + 1] &&
                                 c == '$' && input[(*pos) + 1] == '(') {
-                        wordTok_captureRecursiveCmdSub(
+                        wordTok_tokenizeRecursiveCmdSub(
                                 toks, input, pos, &qContext
                         );
                         continue;
@@ -248,13 +278,13 @@ void capture_wordTok(TokList* toks, char* input, int* pos, Bool* inTok) {
         }
 
         /* Is the token a reserved word? */
-        TOKS_TAIL(toks)->kType = wordTok_setKType(TOKS_TAIL(toks)); /* this line */
+        TOKS_TAIL(toks)->kType = wordTok_setKType(TOKS_TAIL(toks));
 
         /* Move out of the token */
         *inTok = FALSE;
 }
 
-QType wordTok_getCharQType(char* input, int pos) {
+static QType wordTok_getCharQType(char* input, int pos) {
         /* Set quote context */
         switch (input[pos]) {
                 case '\'':
@@ -268,7 +298,7 @@ QType wordTok_getCharQType(char* input, int pos) {
         }
 }
 
-void wordTok_captureRecursiveCmdSub(
+static void wordTok_tokenizeRecursiveCmdSub(
                 TokList* toks, char* input, int* pos, QType* qContext) {
         int pDepth = 1;         /* Parentheses depth counter */
        
@@ -276,12 +306,12 @@ void wordTok_captureRecursiveCmdSub(
         TOKS_TAIL(toks)->untermQ = TRUE;
         *qContext = Q_CMDSUB;
 
-        /* Capture opening $( and advance */
+        /* tokenize opening $( and advance */
         token_appendChar(TOKS_TAIL(toks), input, *pos, *qContext);
         token_appendChar(TOKS_TAIL(toks), input, (*pos) + 1, *qContext);
         (*pos) += 2;
 
-        /* Capture the full command-sub string, accounting for nesting */
+        /* tokenize the full command-sub string, accounting for nesting */
         while (pDepth != 0) {
                 /* Exit the loop early if at end of string, line, or file */
                 if (!input[*pos] || input[*pos] == '\n' || input[*pos] == EOF) {
@@ -311,7 +341,7 @@ void wordTok_captureRecursiveCmdSub(
         *qContext = Q_NONE;
 }
 
-void wordTok_escape(
+static void wordTok_escape(
                 TokList* toks,char* input,int* pos,Bool* inTok,QType qContext) {
         /* If not already in a token, create a new token */
         if (!(*inTok)) {
@@ -334,7 +364,7 @@ void wordTok_escape(
         (*pos) += 2;
 }
 
-Keyword wordTok_setKType(Token* tok) {
+static Keyword wordTok_setKType(Token* tok) {
         /* To avoid having to call free() repeatedly, we will just create the 
          * c-string from the token, set the value of this kType with a series 
          * of if-statements, destroy tht c-string, and return the set value. */
@@ -362,155 +392,4 @@ Keyword wordTok_setKType(Token* tok) {
 
         free(tokStr);
         return kType;
-}
-
-/* TokList methods */
-
-TokList* toks_create(void) {
-        /* Allocate space for the token list object */
-        TokList* toks = moMalloc(sizeof(*toks));
-
-        /* No metadata to initialize */
-
-        /* Allocate space for the contents of the token list */
-        toks->tokList = dList_create();
-
-        /* Return the initialized token list */
-        return toks;
-}
-
-void toks_destroy(TokList* toks) {
-        /* If toks is already free and NULL, attempting to destroy the list 
-         * inside will cause a segfault, so we'll just return without doing 
-         * anything instead */
-        if (!toks) {
-                return;
-        }
-
-        /* Free and reset the token list */
-        dList_destroy(toks->tokList);
-
-        /* No metadata to reset */
-
-        /* Free token list object */
-        moFree(toks);
-}
-
-void toks_addEmptyToken(TokList* toks) {
-        dList_append(toks->tokList, NODE_TOKEN);
-}
-
-/* For debugging */
-void toks_print(TokList* toks) {
-        DLNode* current = NULL; /* Reference to the current token */
-
-        /* Handle empty input */
-        if (!toks || !toks->tokList || !toks->tokList->head) {
-                printf("Input empty. No tokens.\n");
-                return;
-        }
-
-        /* Initialize current to the first token */
-        current = toks->tokList->head;
-
-        /* Print the list of tokens */
-        printf("Tokens: [");
-        while (current) {
-                token_print(current->data.token);
-                if (current->next) {
-                        printf(", ");
-                }
-                current = current->next;
-        }
-        printf("]\n");
-
-        /* Print quote contexts */
-        current = toks->tokList->head;
-        printf("qTypes: [");
-        while (current) {
-                char* types = STR_TEXT(current->data.token->cqTypes);
-
-                printf("%s", types);
-
-                if (current->next) {
-                        printf(", ");
-                }
-
-                moFree(types);
-
-                current = current->next;
-        }
-        printf("]\n");
-
-        /* Print token types */
-        current = toks->tokList->head;
-        printf("Token types: [");
-        while (current) {
-                switch (current->data.token->tType) {
-                        case TOK_WORD: printf("TOK_WORD"); break;
-                        case TOK_SEQ: printf("TOK_SEQ"); break;
-                        case TOK_CASE_END: printf("TOK_CASE_END"); break;
-                        case TOK_PIPE: printf("TOK_PIPE"); break;
-                        case TOK_OR: printf("TOK_OR"); break;
-                        case TOK_BG: printf("TOK_BG"); break;
-                        case TOK_AND: printf("TOK_AND"); break;
-                        case TOK_NOT: printf("TOK_NOT"); break;
-                        case TOK_REDIR_IN: printf("TOK_REDIR_IN"); break;
-                        case TOK_HEREDOC: printf("TOK_HEREDOC"); break;
-                        case TOK_HERE_STRIP: printf("TOK_HERE_STRIP"); break;
-                        case TOK_REDIR_OUT: printf("TOK_REDIR_OUT"); break;
-                        case TOK_APPEND: printf("TOK_APPEND"); break;
-                        case TOK_PAREN_L: printf("TOK_PAREN_L"); break;
-                        case TOK_PAREN_R: printf("TOK_PAREN_R"); break;
-                        default: printf("No token type"); break;
-                }
-
-                if (current->next) {
-                        printf(", ");
-                }
-                
-                current = current->next;
-        }
-        printf("]\n");
-
-        /* Print keyword types */
-        current = toks->tokList->head;
-        printf("Keyword types: [");
-        while (current) {
-                switch (current->data.token->kType) {
-                        /* If-statements */
-                        case KEY_IF: printf("KEY_IF"); break;
-                        case KEY_THEN: printf("KEY_THEN"); break;
-                        case KEY_ELSE: printf("KEY_ELSE"); break;
-                        case KEY_ELIF: printf("KEY_ELIF"); break;
-                        case KEY_FI: printf("KEY_FI"); break;
-
-                        /* Loops */
-                        case KEY_FOR: printf("KEY_FOR"); break;
-                        case KEY_IN: printf("KEY_IN"); break;
-                        case KEY_WHILE: printf("KEY_WHILE"); break;
-                        case KEY_UNTIL: printf("KEY_UNTIL"); break;
-                        case KEY_DO: printf("KEY_DO"); break;
-                        case KEY_DONE: printf("KEY_DONE"); break;
-
-                        /* Switch/case statements */
-                        case KEY_CASE: printf("KEY_CASE"); break;
-                        case KEY_ESAC: printf("KEY_ESAC"); break;
-
-                        /* Not a keyword or error */
-                        default: printf("Not a keyword"); break;
-                }
-
-                if (current->next) {
-                        printf(", ");
-                }
-
-                current = current->next;
-        }
-        printf("]\n");
-
-        /* Say something, if the line ends with an unterminated quote string */
-        if (TOKS_TAIL(toks)->untermQ) {
-                msg_input_error("Unterminated quote");
-        }
 }
