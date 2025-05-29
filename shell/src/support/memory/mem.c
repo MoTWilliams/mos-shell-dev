@@ -3,6 +3,7 @@
 
 #include <stdio.h>      /* for calloc() */
 #include <string.h>     /* for memcpy() */
+#include <unistd.h>     /* for getpid() */
 
 /* Memory allocation error */
 void error_memory(ErrType err) {
@@ -20,10 +21,9 @@ void error_memory(ErrType err) {
                         break;
         }
 
-        fprintf(stderr, 
-                (FG_RED "[" BOLD "MEMORY ERROR" UNBOLD "]" RESET " %s\n"),
-                errMsg
-        );
+        printf(FG_RED "[" BOLD "MEMORY ERROR" UNBOLD "]" RESET);
+        fflush(stdout);
+        fprintf(stderr, "(pid: %d) %s\n", getpid(), errMsg);
 }
 
 void* moCalloc(size_t quantity, size_t size) {
