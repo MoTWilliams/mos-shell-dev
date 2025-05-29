@@ -1,7 +1,7 @@
 #include "engine.h"
 #include "input.h" /* For InputMode */
 
-#include "report_status.h"
+#include "moErr.h"
 #include "textStylesAndColors.h"
 
 #include <stdio.h>
@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
         /* Startup command only has one optional additional argument. more than 
          * 2 total arguments is too many. */
         if (argc > 2) {
-                msg_input_error("too many arguments");
+                REPORT_ERR(NONFATAL, ERR_INPUT, "too many arguments");
                 return 1;
         }
 

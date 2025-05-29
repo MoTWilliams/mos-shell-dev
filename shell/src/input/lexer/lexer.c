@@ -3,7 +3,7 @@
 
 #include "moString.h"
 #include "mem.h"
-#include "constants.h"  /* For Boolean values */
+#include "moBool.h"  /* For Boolean values */
 #include "report_status.h"
 
 #include <stdio.h>      /* For EOF */

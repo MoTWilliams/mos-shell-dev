@@ -1,38 +1,16 @@
 #include "mem.h"
-#include "textStylesAndColors.h"
+#include "moErr.h"
 
 #include <stdio.h>      /* for calloc() */
 #include <string.h>     /* for memcpy() */
-
-/* Memory allocation error */
-void error_memory(ErrType err) {
-        char* errMsg = "";
-
-        switch (err) {
-                case ERR_ALLOC:
-                        errMsg = "Error allocating memory";
-                        break;
-                case ERR_REALLOC:
-                        errMsg = "Error reallocating memory";
-                        break;
-                default:
-                        errMsg = "Unknown memory error";
-                        break;
-        }
-
-        fprintf(stderr, 
-                (FG_RED "[" BOLD "MEMORY ERROR" UNBOLD "]" RESET " %s\n"),
-                errMsg
-        );
-}
+#include <unistd.h>     /* for getpid() */
 
 void* moCalloc(size_t quantity, size_t size) {
         void* newPtr = calloc(quantity, size);
 
         /* Don't limp along if memory allocation fails. Just exit immediately */
         if (!newPtr) {
-                error_memory(ERR_ALLOC);
-                exit(1);
+                REPORT_ERR(FATAL, ERR_OUT_OF_MEMORY, "failed to allocate");
         }
 
         return newPtr;
@@ -52,8 +30,7 @@ void* moRealloc(void* oldPtr, size_t oldQty, size_t newQty, size_t elemSize) {
 
         /* Exit immediately if memory allocation fails */
         if (!newPtr) {
-                error_memory(ERR_REALLOC);
-                exit(1);
+                REPORT_ERR(FATAL, ERR_OUT_OF_MEMORY, "failed to reallocate");
         }
 
         /* If the old pointer is empty (all NULL), no need to copy anything */
@@ -78,7 +55,7 @@ void* moRealloc(void* oldPtr, size_t oldQty, size_t newQty, size_t elemSize) {
 
 /* This is just free with a safety check */
 void moFree(void* ptr) {
-        /* Nothing to free if memory is already free or NULL */
+        /* Nothing to free if memory is already free or NULL--not an error */
         if (!ptr) {
                 return;
         }
