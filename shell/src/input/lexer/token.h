@@ -2,7 +2,7 @@
 #define TOKEN_H
 
 #include "moString.h"
-#include "constants.h"  /* For Boolean values */
+#include "moBool.h"  /* For Boolean values */
 
 struct Token;
 typedef struct Token Token;

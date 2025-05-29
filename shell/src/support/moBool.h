@@ -1,5 +1,5 @@
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#ifndef MO_BOOL_H
+#define MO_BOOL_H
 
 /* Boolean values */
 typedef enum {
