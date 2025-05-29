@@ -2,7 +2,7 @@
 #include "token.h"
 
 #include "mem.h"
-#include "report_status.h"
+#include "moErr.h"
 
 #include <stdio.h>
 
@@ -165,7 +165,7 @@ void toks_print(TokList* toks) {
 
         /* Say something, if the line ends with an unterminated quote string */
         if (TOKS_TAIL(toks)->untermQ) {
-                msg_input_error("Unterminated quote");
+                REPORT_ERR(NONFATAL, ERR_INPUT, "Unterminated quote");
                 printf("\n");
         }
         
