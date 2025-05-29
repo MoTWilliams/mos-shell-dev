@@ -17,6 +17,12 @@
     #define SIZE_HUGE ((size_t)UINT_MAX)
 #endif
 
+/* moCalloc() tests */
+
+Bool test_moCalloc_allocFailure();
+Bool test_moCalloc_normalAlloc();
+Bool test_moCalloc_largeAlloc();
+Bool test_moCalloc_nullInit();
 
 Bool test_moCalloc() {
         char* ptr = NULL;
@@ -82,6 +88,37 @@ Bool test_moCalloc() {
         /* If we get this far, then all tests passed. */
         return TRUE;
 }
+
+Bool test_moCalloc_allocFailure() {
+        /* Fork a child process, otherwise this test will terminate the test 
+         * suite on success */
+        size_t pid = fork();
+        int status;
+}
+
+Bool test_moCalloc_normalAlloc() {
+        char* ptr = moCalloc(SIZE_NORMAL, sizeof(*ptr));
+
+        /* If ptr is still NULL after allocation, the allocation has failed */
+        if (!ptr) {
+                return FALSE;
+        }
+
+        /* Otherwise, allocation was successful--test passed */
+        moFree(ptr);
+        ptr = NULL;
+        return TRUE;
+}
+
+Bool test_moCalloc_largeAlloc() {}
+
+Bool test_moCalloc_nullInit() {
+
+}
+
+
+
+/* moMalloc() tests */
 
 Bool test_moMalloc() {
         return TRUE;
