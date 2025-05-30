@@ -26,7 +26,8 @@ int main(int argc, char* argv[]) {
                 mode = MODE_BATCH;
         }
 
-        /* Run the shell in the appropriate mode. argv[] is automatically NULL-terminated, so passing in the second argument is always safe. */
+        /* Run the shell in the appropriate mode. argv[] is automatically 
+         * NULL-terminated, so passing in the second argument is always safe. */
         runShell(mode, argv[1]);
 
         /* You'll only see this if all else goes how it should. */
