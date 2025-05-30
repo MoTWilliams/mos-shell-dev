@@ -1,23 +1,25 @@
 #include "token.h"
 #include "moString.h"
+
 #include "mem.h"
+#include "moErr.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
 Token* token_create(void) {
         /* ALlocate space for the token object */
-        Token* tok = moMalloc(sizeof(*tok));
+        Token* tok = moMalloc(sizeof(*tok), FATAL);
 
         /* Initialize Metadata */
         tok->lineNo = 0;
         tok->tType = TOK_NOTYPE;
         tok->kType = KEY_NOTYPE;
-        tok->cqTypes = str_create();
+        tok->cqTypes = str_create(FATAL);
         tok->untermQ = FALSE;
 
         /* Allocate space for the token's contents */
-        tok->tokText = str_create();
+        tok->tokText = str_create(FATAL);
 
         /* Return the initialized token */
         return tok;
@@ -49,27 +51,27 @@ void token_destroy(Token* tok) {
 
 void token_appendChar(Token* tok, char* src, int pos, QType qType) {
         /* Add the character to the token's string */
-        str_append(tok->tokText, src, pos);
+        str_append(tok->tokText, src, pos, FATAL);
 
         /* Add context marker to the character contexts string */
         switch (qType) {
                 case Q_NONE: /* not in quotes */
-                        str_append(tok->cqTypes, "-", 0);
+                        str_append(tok->cqTypes, "-", 0, FATAL);
                         return;
                 case Q_SINGLE: /* '...' */
-                        str_append(tok->cqTypes, "S", 0);
+                        str_append(tok->cqTypes, "S", 0, FATAL);
                         return;
                 case Q_DOUBLE: /* "..." */
-                        str_append(tok->cqTypes, "D", 0);
+                        str_append(tok->cqTypes, "D", 0, FATAL);
                         return;
                 case Q_CMDSUB: /* `...` */
-                        str_append(tok->cqTypes, "C", 0);
+                        str_append(tok->cqTypes, "C", 0, FATAL);
                         return;
         }
 }
 
 void token_print(Token* tok) {
-        char* tokTextPlain = STR_TEXT(tok->tokText);
+        char* tokTextPlain = STR_TEXT(tok->tokText, FATAL);
 
         printf("%s", tokTextPlain);
 

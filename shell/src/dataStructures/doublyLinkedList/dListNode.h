@@ -2,6 +2,8 @@
 #ifndef D_LIST_NODE_H
 #define D_LIST_NODE_H
 
+#include "moErr.h"
+
 /* Forward declarations */
 
 /* Base node */
@@ -34,7 +36,7 @@ struct DLNode {
         DLNode* prev;
 };
 
-struct DLNode* dNode_create(NodeType type);
+struct DLNode* dNode_create(NodeType type, Fatality isFatal);
 void dNode_destroy(DLNode* node);
 
 #endif

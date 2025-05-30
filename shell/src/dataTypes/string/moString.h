@@ -3,11 +3,14 @@
 
 #include "buffer.h"
 
+#include "moErr.h"
+
 #define STR_AT(str, pos) ((str)->buff->data[(pos)].chr)
 #define STR_LEN(str) ((str)->buff->length)
-#define STR_TEXT(str) (str_getText(str)) /* Always assign to a char* variable */
-                                         /* and free() after use, because */ 
-                                         /* str_getText() allocates memory */
+
+/* Always assign STR_TEXT to a char* variable and free() after use, because 
+ * str_getText() allocates memory */
+#define STR_TEXT(str, isFatal) (str_getText(str, isFatal)) 
 
 typedef struct String {
         /* Contents */
@@ -17,17 +20,17 @@ typedef struct String {
 } String;
 
 /* Memory allocation and initialization */
-String* str_create(void);
+String* str_create(Fatality isFatal);
 
 /* Cleanup */
 void str_destroy(String* str);
 
 /* Add a character to the end of the string. Call with src = NULL and */
 /* index = -1 to append from stdin. pos is position in the source string */
-char str_append(String* str, void* src, int pos);
+char str_append(String* str, void* src, int pos, Fatality isFatal);
 
 /* Retrieve the string's contents - always free() after calling. 
  * Null-terminator is guaranteed due to zeroed memory in moMalloc() */
-char* str_getText(String* str);
+char* str_getText(String* str, Fatality isFatal);
 
 #endif

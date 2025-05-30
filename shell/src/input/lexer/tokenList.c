@@ -8,12 +8,12 @@
 
 TokList* toks_create(void) {
         /* Allocate space for the token list object */
-        TokList* toks = moMalloc(sizeof(*toks));
+        TokList* toks = moMalloc(sizeof(*toks), FATAL);
 
         /* No metadata to initialize */
 
         /* Allocate space for the contents of the token list */
-        toks->tokList = dList_create();
+        toks->tokList = dList_create(FATAL);
 
         /* Return the initialized token list */
         return toks;
@@ -37,7 +37,7 @@ void toks_destroy(TokList* toks) {
 }
 
 void toks_addEmptyToken(TokList* toks) {
-        dList_append(toks->tokList, NODE_TOKEN);
+        dList_append(toks->tokList, NODE_TOKEN, FATAL);
 }
 
 /* For debugging */
@@ -82,7 +82,7 @@ void toks_print(TokList* toks) {
         current = toks->tokList->head;
         printf("qTypes: [");
         while (current) {
-                char* types = STR_TEXT(current->data.token->cqTypes);
+                char* types = STR_TEXT(current->data.token->cqTypes, FATAL);
 
                 printf("%s", types);
 

@@ -1,19 +1,20 @@
 #include "moString.h"
+
 #include "mem.h"
 
 #include <stdio.h> /* For getchar()*/
 
 /* Allocate memory and initialize the string's contents and metadata */
-String* str_create(void) {
+String* str_create(Fatality isFatal) {
         /* Allocate space for the string object */
-        String* str = moMalloc(sizeof(*str));
+        String* str = moMalloc(sizeof(*str), isFatal);
 
         /* TODO: initialize metadata, when/if it exists */
 
         /* Allocate space for the string's contents */
-        str->buff = buff_create(BUFF_CHAR);
+        if (str) str->buff = buff_create(BUFF_CHAR, isFatal);
 
-        /* Return the initialized String */
+        /* Return the initialized String or NULL */
         return str;
 }
 
@@ -34,12 +35,15 @@ static char getNextChar(void* src, int index);
 
 /* Add a character to the end of the string. Call with src = NULL and index = 
  * -1 to append from stdin */
-char str_append(String* str, void* src, int pos) {
-        char c = '-';   /* The character to append */
+char str_append(String* str, void* src, int pos, Fatality isFatal) {
+        char c = '\0';   /* The character to append */
         
+        /* Return NULL immediately if str is NULL--not an error */
+        if (!str) return c;
+
         /* Resize the string's buffer, if necessary */
         if (STR_LEN(str) == str->buff->capacity) {
-                buff_resize(str->buff);
+                buff_resize(str->buff, isFatal);
         }
 
         /* Grab the next character */
@@ -90,17 +94,19 @@ static char getCharFrom_string(char* src, int index) {
 }
 
 /* Retrieve the string's text. Don't forget to free() after use */
-char* str_getText(String* str) {
+char* str_getText(String* str, Fatality isFatal) {
         /* Allocate space for the c-string. +1 to ensure space for the 
          * null-terminator */
-        char* out = moCalloc(STR_LEN(str) + 1, sizeof(*out));
+        char* out = moCalloc(STR_LEN(str) + 1, sizeof(*out), isFatal);
 
-        /* Copy the contents of the String into a regular character array */
-        int i;  /* Must be declared at the top of the function for C89 */
-        for (i = 0; i < STR_LEN(str); i++) {
-                out[i] = STR_AT(str, i);
+        /* Copy the contents of the String into a regular char array */
+        if (out) {
+                int i; 
+                for (i = 0; i < STR_LEN(str); i++) {
+                        out[i] = STR_AT(str, i);
+                }
         }
 
-        /* Return the plain char array */
+        /* Return the plain char array or NULL */
         return out;
 }

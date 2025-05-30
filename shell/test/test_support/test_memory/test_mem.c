@@ -1,5 +1,6 @@
 #include "test_mem.h"
 #include "mem.h"
+#include "moErr.h"
 
 #include <stdio.h>
 #include <unistd.h>     /* For pid_t and fork() */
@@ -30,7 +31,7 @@ Bool test_moCalloc() {
         int status;
         
         /* Test normal allocation and zero-initialization */
-        ptr = moCalloc(SIZE_NORMAL, sizeof(*ptr));
+        ptr = moCalloc(SIZE_NORMAL, sizeof(*ptr), FATAL);
 
         /* If ptr is still NULL after allocation, the allocation has failed */
         if (!ptr) {
@@ -50,7 +51,7 @@ Bool test_moCalloc() {
         ptr = NULL;
 
         /* Test large-but-not-too-large allocation (1 MB) */
-        ptr = moCalloc(SIZE_LARGE, 1);
+        ptr = moCalloc(SIZE_LARGE, 1, FATAL);
         if (!ptr) return FALSE;
         moFree(ptr);
         ptr = NULL;
@@ -64,7 +65,7 @@ Bool test_moCalloc() {
                 return FALSE;
         } else if (pid == 0) { /* Child process */
                 size_t pg;
-                ptr = moCalloc(SIZE_HUGE, 1);
+                ptr = moCalloc(SIZE_HUGE, 1, FATAL);
 
                 /* Touch each page to force real allocation */
                 for (pg = 0; pg < SIZE_HUGE * 1; pg += SIZE_PAGE) {
@@ -97,7 +98,7 @@ Bool test_moCalloc_allocFailure() {
 }
 
 Bool test_moCalloc_normalAlloc() {
-        char* ptr = moCalloc(SIZE_NORMAL, sizeof(*ptr));
+        char* ptr = moCalloc(SIZE_NORMAL, sizeof(*ptr), FATAL);
 
         /* If ptr is still NULL after allocation, the allocation has failed */
         if (!ptr) {

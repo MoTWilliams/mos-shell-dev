@@ -1,11 +1,15 @@
 /* Doubly-linked list node methods */
 #include "dListNode.h"
 #include "token.h"
+
 #include "mem.h"
 
-DLNode* dNode_create(NodeType type) {
+DLNode* dNode_create(NodeType type, Fatality isFatal) {
         /* Allocate space for the node */
-        DLNode* node = moMalloc(sizeof(*node));
+        DLNode* node = moMalloc(sizeof(*node), isFatal);
+
+        /* Return NULL on nonfatal moMalloc failure */
+        if (!node) return NULL;
 
         /* Set the node's type */
         node->type = type;
@@ -26,6 +30,9 @@ DLNode* dNode_create(NodeType type) {
 }
 
 void dNode_destroy(DLNode* node) {
+        /* Return early if NULL is passed in */
+        if (!node) return;
+
         /* Destroy the contents with the appropriate methods */
         switch (node->type) {
                 case NODE_TOKEN:
