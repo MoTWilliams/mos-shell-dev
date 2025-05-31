@@ -13,11 +13,11 @@ typedef enum {
 } TestGroup;
 
 TestResult moAssert(
-        Bool condition, const char* msg, const char* file, int line, 
-        int* gFails, int* tTests, int* gTests);
+        Bool condition, const char* msg, const char* file, 
+        int line, int* tTests, int* gTests);
 
 #define TEST_ASSERT(condition, message) \
         (moAssert(condition, message, __FILE__, __LINE__, \
-                &gFails, &tTests, &gTests))
+                tTests, gTests))
 
 #endif
