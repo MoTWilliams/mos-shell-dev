@@ -1,5 +1,4 @@
 #include "mem.h"
-#include "moErr.h"
 
 #include <stdio.h>      /* for calloc() */
 #include <string.h>     /* for memcpy() */
@@ -10,7 +9,10 @@ void* moCalloc(size_t quantity, size_t size, Fatality isFatal) {
 
         /* Don't limp along if memory allocation fails. Just exit immediately */
         if (!newPtr) {
-                REPORT_ERR(isFatal, ERR_OUT_OF_MEMORY, "failed to allocate");
+                REPORT_ERR(
+                        isFatal, ERR_OUT_OF_MEMORY,
+                        "IN moCalloc(); Failed to allocate"
+                );
         }
 
         return newPtr;
@@ -31,7 +33,10 @@ void* moRealloc(void* oldPtr, size_t oldQty, size_t newQty,
 
         /* Exit immediately if memory allocation fails */
         if (!newPtr) {
-                REPORT_ERR(isFatal, ERR_OUT_OF_MEMORY, "failed to reallocate");
+                REPORT_ERR(
+                        isFatal, ERR_OUT_OF_MEMORY,
+                        "IN moRealloc(); failed to reallocate"
+                );
         }
 
         /* If the old pointer is empty (all NULL), no need to copy anything */

@@ -23,9 +23,7 @@ void toks_destroy(TokList* toks) {
         /* If toks is already free and NULL, attempting to destroy the list 
          * inside will cause a segfault, so we'll just return without doing 
          * anything instead */
-        if (!toks) {
-                return;
-        }
+        if (!toks) return;
 
         /* Free and reset the token list */
         dList_destroy(toks->tokList);
@@ -165,7 +163,10 @@ void toks_print(TokList* toks) {
 
         /* Say something, if the line ends with an unterminated quote string */
         if (TOKS_TAIL(toks)->untermQ) {
-                REPORT_ERR(NONFATAL, ERR_INPUT, "Unterminated quote");
+                REPORT_ERR(
+                        NONFATAL, ERR_INPUT,
+                        "IN toks_print(); Unterminated quote"
+                );
                 printf("\n");
         }
         

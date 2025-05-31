@@ -9,24 +9,26 @@ Buffer* buff_create(BuffType type, Fatality isFatal) {
         /* Allocate space for the buffer and its attributes */
         Buffer* buff = moMalloc(sizeof(*buff), isFatal);
 
-        /* If allocation successful, initialize the buffer */
-        if (buff) {
-                /* Initialize metadata */
-                buff->type = type;
-                buff->capacity = INIT_SIZE;
-                buff->length = 0;
+        /* Immediately return NULL if allocation fails*/
+        if (!buff) return NULL;
 
-                /* Allocate space for the contents */
-                buff->data = moCalloc(buff->capacity + 1, 
-                                                sizeof(*buff->data), isFatal);
-        }
+        /* Initialize metadata */
+        buff->type = type;
+        buff->capacity = INIT_SIZE;
+        buff->length = 0;
 
-        /* Return the initialized buffer object or NULL */
+        /* Allocate space for the contents */
+        buff->data = moCalloc(buff->capacity + 1, sizeof(*buff->data), isFatal);
+
+        /* Return the initialized buffer object */
         return buff;
 }
 
 /* Cleanup */
 void buff_destroy(Buffer* buff) {
+        /* Do nothing if buff is already free and NULL*/
+        if (!buff) return;
+
         /* Free and reset the contents */
         moFree(buff->data);
         buff->data = NULL;
@@ -46,20 +48,18 @@ Buffer* buff_resize(Buffer* buff, Fatality isFatal) {
          * the null-terminator */
         size_t oldCapacity = buff->capacity;
         size_t newCapacity = buff->capacity * 2;
+        
+        /* Do nothing and immediately return NULL if buff is NULL */
+        if (!buff) return NULL;
 
-        /* Reallocation error is handled elsewhere. This just doesn't fire if a 
-         * NULL pointer is passed in*/
-        if (buff) {
-                /* Re-allocate memory for the larger contents. + 1 for 
-                 * null-teminator */
-                buff->data = moRealloc(
-                        buff->data, oldCapacity+1, newCapacity+1, 
-                        sizeof(*buff->data), isFatal
-                );
+        /* Re-allocate memory for the larger contents. + 1 for null-teminator */
+        buff->data = moRealloc(
+                buff->data, oldCapacity + 1, newCapacity + 1, 
+                sizeof(*buff->data), isFatal
+        );
 
-                /* Resize the capacity metadata */
-                buff->capacity = newCapacity;
-        }
+        /* Resize the capacity metadata */
+        buff->capacity = newCapacity;
 
         /* return the resized buffer or NULL */
         return buff;

@@ -29,9 +29,7 @@ void token_destroy(Token* tok) {
         /* If tok is already free and NULL, attempting to destroy the strings 
          * inside will cause a segfault, so we'll just return without doing 
          * anything instead */
-        if (!tok) {
-                return;
-        }
+        if (!tok) return;
 
         /* Free and reset the token's contents */
         str_destroy(tok->tokText);

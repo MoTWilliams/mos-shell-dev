@@ -14,7 +14,10 @@ int main(int argc, char* argv[]) {
         /* Startup command only has one optional additional argument. more than 
          * 2 total arguments is too many. */
         if (argc > 2) {
-                REPORT_ERR(NONFATAL, ERR_INPUT, "too many arguments");
+                REPORT_ERR(
+                        NONFATAL, ERR_INPUT,
+                        "IN main(); too many arguments"
+                );
                 return 1;
         }
 

@@ -30,7 +30,7 @@ DLNode* dNode_create(NodeType type, Fatality isFatal) {
 }
 
 void dNode_destroy(DLNode* node) {
-        /* Return early if NULL is passed in */
+        /* Return early if node is already free and NULL */
         if (!node) return;
 
         /* Destroy the contents with the appropriate methods */

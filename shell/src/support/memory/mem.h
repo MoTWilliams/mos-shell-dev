@@ -1,6 +1,8 @@
 #ifndef MEM_H
 #define MEM_H
 
+#include "moErr.h"
+
 #include <stdlib.h>
 
 /* Allocates an array of memory blocks */

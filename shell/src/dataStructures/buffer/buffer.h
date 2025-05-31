@@ -40,6 +40,6 @@ Buffer* buff_create(BuffType type, Fatality isFatal);
 void buff_destroy(Buffer* buff);
 
 /* Double the capacity */
-void buff_resize(Buffer* buff, Fatality isFatal);
+Buffer* buff_resize(Buffer* buff, Fatality isFatal);
 
 #endif

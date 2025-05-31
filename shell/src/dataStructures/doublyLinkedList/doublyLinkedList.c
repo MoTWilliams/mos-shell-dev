@@ -6,11 +6,12 @@ DList* dList_create(Fatality isFatal) {
         /* Allocate memory for the list */
         DList* list = moMalloc(sizeof(*list), isFatal);
 
-        /* Initialize the empty list's pointers on successful allocation */
-        if (list) {
-                list->head = NULL;
-                list->tail = NULL;
-        }
+        /* Do nothing and return NULL on nonfatal allocation failure */
+        if (!list) return NULL;
+
+        /* Initialize the empty list's pointers */
+        list->head = NULL;
+        list->tail = NULL;
 
         /* Return the empty list or NULL */
         return list;
@@ -21,9 +22,7 @@ void dList_destroy(DList* list) {
 
         /* If NULL is passed into dList_destroy, attempting to assign current  
          * to the head of the list will segfault, so we'll just exit early */
-        if (!list) {
-                return;
-        }
+        if (!list) return;
 
         /* Grab the current node */
         current = list->head;
@@ -63,5 +62,6 @@ DLNode* dList_append(DList* list, NodeType type, Fatality isFatal) {
                 list->tail = newNode;
         }
 
+        /* return the node that was just created */
         return newNode;
 }

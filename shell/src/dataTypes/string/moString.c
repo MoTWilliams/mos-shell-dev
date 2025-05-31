@@ -9,10 +9,13 @@ String* str_create(Fatality isFatal) {
         /* Allocate space for the string object */
         String* str = moMalloc(sizeof(*str), isFatal);
 
+        /* Do nothing and return NULL on allocation failure */
+        if (!str) return NULL;
+
         /* TODO: initialize metadata, when/if it exists */
 
         /* Allocate space for the string's contents */
-        if (str) str->buff = buff_create(BUFF_CHAR, isFatal);
+        str->buff = buff_create(BUFF_CHAR, isFatal);
 
         /* Return the initialized String or NULL */
         return str;
@@ -20,6 +23,9 @@ String* str_create(Fatality isFatal) {
 
 /* Cleanup */
 void str_destroy(String* str) {
+        /* No nothing and return early if str is already free and NULL */
+        if (!str) return;
+
         /* Free and reset the string's contents */
         buff_destroy(str->buff);
         str->buff = NULL;
@@ -98,15 +104,16 @@ char* str_getText(String* str, Fatality isFatal) {
         /* Allocate space for the c-string. +1 to ensure space for the 
          * null-terminator */
         char* out = moCalloc(STR_LEN(str) + 1, sizeof(*out), isFatal);
+        int i;  /* Counter */
+
+        /* Do nothing and return NULL on nonfatal allocation error */
+        if (!out) return NULL;
 
         /* Copy the contents of the String into a regular char array */
-        if (out) {
-                int i; 
-                for (i = 0; i < STR_LEN(str); i++) {
-                        out[i] = STR_AT(str, i);
-                }
+        for (i = 0; i < STR_LEN(str); i++) {
+                out[i] = STR_AT(str, i);
         }
 
-        /* Return the plain char array or NULL */
+        /* Return the plain char array */
         return out;
 }
