@@ -4,14 +4,16 @@
 
 #include "dListNode.h"
 
+#include "moErr.h"
+
 typedef struct DList {
         DLNode* head;
         DLNode* tail;
 } DList;
 
-DList* dList_create(void);
+DList* dList_create(Fatality isFatal);
 void dList_destroy(DList* list);
 
-void dList_append(DList* list, NodeType type);
+DLNode* dList_append(DList* list, NodeType type, Fatality isFatal);
 
 #endif

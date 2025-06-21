@@ -1,15 +1,19 @@
 #include "doublyLinkedList.h"
+
 #include "mem.h"
 
-DList* dList_create(void) {
+DList* dList_create(Fatality isFatal) {
         /* Allocate memory for the list */
-        DList* list = moMalloc(sizeof(*list));
+        DList* list = moMalloc(sizeof(*list), isFatal);
+
+        /* Do nothing and return NULL on nonfatal allocation failure */
+        if (!list) return NULL;
 
         /* Initialize the empty list's pointers */
         list->head = NULL;
         list->tail = NULL;
 
-        /* Return the empty list */
+        /* Return the empty list or NULL */
         return list;
 }
 
@@ -18,9 +22,7 @@ void dList_destroy(DList* list) {
 
         /* If NULL is passed into dList_destroy, attempting to assign current  
          * to the head of the list will segfault, so we'll just exit early */
-        if (!list) {
-                return;
-        }
+        if (!list) return;
 
         /* Grab the current node */
         current = list->head;
@@ -41,9 +43,12 @@ void dList_destroy(DList* list) {
         moFree(list);
 }
 
-void dList_append(DList* list, NodeType type) {
+DLNode* dList_append(DList* list, NodeType type, Fatality isFatal) {
         /* Create the new node of appropriate type */
-        DLNode* newNode = dNode_create(type);
+        DLNode* newNode = dNode_create(type, isFatal);
+
+        /* Return NULL on nonfatal failure on node_create() */
+        if (!newNode) return NULL;
 
         /* Special case: the list is empty--new node is now head */
         if (!list->head) {
@@ -56,4 +61,7 @@ void dList_append(DList* list, NodeType type) {
                 newNode->prev = list->tail;
                 list->tail = newNode;
         }
+
+        /* return the node that was just created */
+        return newNode;
 }

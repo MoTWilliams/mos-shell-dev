@@ -14,7 +14,10 @@ int main(int argc, char* argv[]) {
         /* Startup command only has one optional additional argument. more than 
          * 2 total arguments is too many. */
         if (argc > 2) {
-                REPORT_ERR(NONFATAL, ERR_INPUT, "too many arguments");
+                REPORT_ERR(
+                        NONFATAL, ERR_INPUT,
+                        "IN main(); too many arguments"
+                );
                 return 1;
         }
 
@@ -26,7 +29,8 @@ int main(int argc, char* argv[]) {
                 mode = MODE_BATCH;
         }
 
-        /* Run the shell in the appropriate mode. argv[] is automatically NULL-terminated, so passing in the second argument is always safe. */
+        /* Run the shell in the appropriate mode. argv[] is automatically 
+         * NULL-terminated, so passing in the second argument is always safe. */
         runShell(mode, argv[1]);
 
         /* You'll only see this if all else goes how it should. */

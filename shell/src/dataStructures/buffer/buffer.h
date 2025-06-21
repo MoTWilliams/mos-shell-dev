@@ -1,6 +1,8 @@
 #ifndef BUFFER_H
 #define BUFFER_H
 
+#include "moErr.h"
+
 /* Forward-declarations */
 struct String;
 
@@ -32,12 +34,12 @@ typedef struct Buffer {
 } Buffer;
 
 /* Memory allocation and initialization */
-Buffer* buff_create(BuffType type);
+Buffer* buff_create(BuffType type, Fatality isFatal);
 
 /* Cleanup */
 void buff_destroy(Buffer* buff);
 
 /* Double the capacity */
-void buff_resize(Buffer* buff);
+Buffer* buff_resize(Buffer* buff, Fatality isFatal);
 
 #endif

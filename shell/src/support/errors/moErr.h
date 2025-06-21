@@ -14,9 +14,9 @@ typedef enum {
 } ErrNo;
 
 ErrNo report_err(Fatality fatal, ErrNo errNo, char* msg,
-                        const char* file, int line, const char* func);
+                        const char* file, int line);
 
 #define REPORT_ERR(fatal, errNo, msg) \
-        report_err(fatal, errNo, msg, __FILE__, __LINE__, __func__)
+        report_err(fatal, errNo, msg, __FILE__, __LINE__)
 
 #endif

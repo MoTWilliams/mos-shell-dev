@@ -31,14 +31,22 @@ TEST_BIN = runTests
 $(TEST_BIN): $(TEST_OBJ) $(LIB_ARCHIVE)
 	$(CC) -o $@ $^ $(CFLAGS)
 
-test: $(TEST_BIN)
-	./$(TEST_BIN)
-
 .PHONY: clean
 
 clean:
-	rm -f $(OBJ) $(TEST_OBJ) $(TEST_BIN) $(LIB_ARCHIVE)
-	rm -f moshell
+	rm -f $(OBJ) $(TEST_OBJ) $(TEST_BIN) $(LIB_ARCHIVE) moshell
+
+# Always run tests under Valgrind
+test: $(TEST_BIN)
+	./$(TEST_BIN)
+	make clean
+
+test_valgrind: $(TEST_BIN)
+	valgrind --leak-check=full \
+			 --track-origins=yes \
+			 --show-leak-kinds=all \
+			 ./$(TEST_BIN)
+	make clean
 
 uninstall:
 	@{ \
@@ -62,3 +70,11 @@ install: moshell
 		fi; \
 	}
 
+# Run the shell itself under Valgrind
+valgrind: moshell
+	make install
+	valgrind --leak-check=full \
+			 --track-origins=yes \
+			 --show-leak-kinds=all \
+			 moshell
+	make uninstall

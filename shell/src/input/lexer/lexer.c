@@ -4,7 +4,6 @@
 #include "moString.h"
 #include "mem.h"
 #include "moBool.h"  /* For Boolean values */
-#include "report_status.h"
 
 #include <stdio.h>      /* For EOF */
 #include <string.h>
@@ -369,7 +368,7 @@ static Keyword wordTok_setKType(Token* tok) {
          * c-string from the token, set the value of this kType with a series 
          * of if-statements, destroy tht c-string, and return the set value. */
         Keyword kType = KEY_NOTYPE;
-        char* tokStr = STR_TEXT(tok->tokText);
+        char* tokStr = STR_TEXT(tok->tokText, FATAL);
 
         /* Control flow: if-statements */
         if (!strcmp(tokStr, "if")) kType = KEY_IF;

@@ -8,12 +8,12 @@
 
 TokList* toks_create(void) {
         /* Allocate space for the token list object */
-        TokList* toks = moMalloc(sizeof(*toks));
+        TokList* toks = moMalloc(sizeof(*toks), FATAL);
 
         /* No metadata to initialize */
 
         /* Allocate space for the contents of the token list */
-        toks->tokList = dList_create();
+        toks->tokList = dList_create(FATAL);
 
         /* Return the initialized token list */
         return toks;
@@ -23,9 +23,7 @@ void toks_destroy(TokList* toks) {
         /* If toks is already free and NULL, attempting to destroy the list 
          * inside will cause a segfault, so we'll just return without doing 
          * anything instead */
-        if (!toks) {
-                return;
-        }
+        if (!toks) return;
 
         /* Free and reset the token list */
         dList_destroy(toks->tokList);
@@ -37,7 +35,7 @@ void toks_destroy(TokList* toks) {
 }
 
 void toks_addEmptyToken(TokList* toks) {
-        dList_append(toks->tokList, NODE_TOKEN);
+        dList_append(toks->tokList, NODE_TOKEN, FATAL);
 }
 
 /* For debugging */
@@ -82,7 +80,7 @@ void toks_print(TokList* toks) {
         current = toks->tokList->head;
         printf("qTypes: [");
         while (current) {
-                char* types = STR_TEXT(current->data.token->cqTypes);
+                char* types = STR_TEXT(current->data.token->cqTypes, FATAL);
 
                 printf("%s", types);
 
@@ -165,7 +163,10 @@ void toks_print(TokList* toks) {
 
         /* Say something, if the line ends with an unterminated quote string */
         if (TOKS_TAIL(toks)->untermQ) {
-                REPORT_ERR(NONFATAL, ERR_INPUT, "Unterminated quote");
+                REPORT_ERR(
+                        NONFATAL, ERR_INPUT,
+                        "IN toks_print(); Unterminated quote"
+                );
                 printf("\n");
         }
         
