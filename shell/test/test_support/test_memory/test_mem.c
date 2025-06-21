@@ -6,8 +6,8 @@ int test_mem(int* tTests, int* gTests) {
         (*gTests) = 0;
         
         gFails += test_moCalloc(tTests, gTests);
-        /* gFails += test_moMalloc(tTests, gTests) */
-        /* gFails += test_moMalloc(tTests, gTests) */
+        gFails += test_moMalloc(tTests, gTests);
+        /* gFails += test_moMalloc(tTests, gTests); */
 
         return gFails;
 }
