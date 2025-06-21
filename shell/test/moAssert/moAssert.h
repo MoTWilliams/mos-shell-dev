@@ -2,6 +2,7 @@
 #define MO_ASSERT_H
 
 #include "moBool.h"
+#include "test_utility.h"
 
 typedef enum {
     TEST_PASS,
