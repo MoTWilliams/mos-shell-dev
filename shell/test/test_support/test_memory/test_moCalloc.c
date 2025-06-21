@@ -2,17 +2,19 @@
 #include "test_mem.h"
 #include "mem.h"
 
-Bool test_moCalloc_allocFailure_FATAL();
-Bool test_moCalloc_zeroAlloc_FATAL();
-Bool test_moCalloc_normalAlloc_FATAL();
-Bool test_moCalloc_largeAlloc_FATAL();
-Bool test_moCalloc_nullInit_FATAL();
+#include "test_utility.h"
 
-Bool test_moCalloc_allocFailure_NONFATAL();
-Bool test_moCalloc_zeroAlloc_NONFATAL();
-Bool test_moCalloc_normalAlloc_NONFATAL();
-Bool test_moCalloc_largeAlloc_NONFATAL();
-Bool test_moCalloc_nullInit_NONFATAL();
+static Bool test_moCalloc_allocFailure_FATAL();
+static Bool test_moCalloc_zeroAlloc_FATAL();
+static Bool test_moCalloc_normalAlloc_FATAL();
+static Bool test_moCalloc_largeAlloc_FATAL();
+static Bool test_moCalloc_nullInit_FATAL();
+
+static Bool test_moCalloc_allocFailure_NONFATAL();
+static Bool test_moCalloc_zeroAlloc_NONFATAL();
+static Bool test_moCalloc_normalAlloc_NONFATAL();
+static Bool test_moCalloc_largeAlloc_NONFATAL();
+static Bool test_moCalloc_nullInit_NONFATAL();
 
 int test_moCalloc(int* tTests, int* gTests) {
         /* Group fail counter */
@@ -75,163 +77,112 @@ int test_moCalloc(int* tTests, int* gTests) {
         return gFails;
 }
 
-Bool test_moCalloc_allocFailure_FATAL() {
-        /* Fork a child process, otherwise successful allocation failure will 
-         * terminate the test suite on success */
-        int status = -99;
-        size_t pid = fork();
-        
-        if ((int)pid < 0) {
-                REPORT_ERR(
-                        NONFATAL, ERR_FORK, 
-                        "IN test_moCalloc_allocFailure_FATAL(); fork failed"
-                );
-                return FALSE;
-        } else if (pid == 0) {
-                size_t page = 0;
-                char* ptr = moCalloc(SIZE_HUGE, sizeof(*ptr), FATAL);
+/* Test that FATAL mode triggers crash on allocation failure */
+static OpStatus allocFailure_FATAL_OPERATION();
 
-                /* Touch each page to force real allocation. This crashes when 
-                 * space runs out */
-                for (page = 0; page < SIZE_HUGE + 1; page += SIZE_PAGE) {
-                        ((char*)ptr)[page] = 1;
-                }
-
-                /* Force test to fail if moCalloc() does NOT fail as intended */
-                _exit(1);
-        }
-
-        /* Wait for the child process to finish */
-        waitpid(pid, &status, 0);
-
-        /* If the child exits normally instead of failing, the test failed */
-        if (WIFEXITED(status) && WEXITSTATUS(status) == 0) return FALSE;
-
-        /* Otherwise, allocation failed as intended--test passed */
-        return TRUE;
+static Bool test_moCalloc_allocFailure_FATAL() {
+        return runTestInChildProcess(
+                "test_moCalloc_allocFailure_FATAL()",
+                allocFailure_FATAL_OPERATION, EXPECT_FAILURE
+        );
 }
 
-Bool test_moCalloc_allocFailure_NONFATAL() {
-        /* Fork a child process, otherwise successful allocation failure will 
-         * terminate the test suite on success */
-        int status = -99;
-        size_t pid = fork();
-        
-        if ((int)pid < 0) {
-                REPORT_ERR(
-                        NONFATAL, ERR_FORK,
-                        "IN test_moCalloc_allocFailure_NONFATAL(); fork failed"
-                );
-                return FALSE;
-        } else if (pid == 0) {
-                size_t page = 0;
-                char* ptr = moCalloc(SIZE_HUGE, sizeof(*ptr), NONFATAL);
+static OpStatus allocFailure_FATAL_OPERATION() {
+        /* Deliberately attempt to allocate too much memory */
+        size_t page;
+        char* ptr = moCalloc(SIZE_HUGE, sizeof(*ptr), FATAL);
 
-                /* If allocation fails as expected in NONFATAL mode, exit 
-                 * cleanly */
-                if (!ptr) _exit(0);
-
-                /* Touch each page to force real allocation. This crashes when 
-                 * space runs out */
-                for (page = 0; page < SIZE_HUGE + 1; page += SIZE_PAGE) {
-                        ((char*)ptr)[page] = 1;
-                }
-
-                /* Force test to fail if moCalloc() does NOT fail as intended */
-                _exit(1);
+        /* Touch each page to force physical allocation. This crashes when 
+         * space runs out. */
+        for (page = 0; page < SIZE_HUGE + 1; page += SIZE_PAGE) {
+                ((char*)ptr)[page] = 1;
         }
 
-        /* Wait for the child process to finish */
-        waitpid(pid, &status, 0);
-
-        /* If the child exits normally instead of failing, the test failed */
-        if (WIFEXITED(status) && WEXITSTATUS(status) == 0) return FALSE;
-
-        /* Otherwise, allocation failed as intended--test passed */
-        return TRUE;
+        /* If we made it this far, the operation failed to fail, so we return 
+         * operation success--test failed */
+        return OP_SUCCESS;
 }
 
-Bool test_moCalloc_zeroAlloc_FATAL() {
-        /* Fork a child process, because failure on freeing the pointer will 
-         * result in crash */
-        int status = -99;
-        size_t pid = fork();
-        
-        if ((int)pid < 0) {
-                REPORT_ERR(
-                        NONFATAL, ERR_FORK,
-                        "IN test_moCalloc_zeroAlloc_FATAL(); fork failed"
-                );
-                return FALSE;
-        } else if (pid == 0) {
-                /* Attept to allocate size zero memory block */
-                char* ptr = moCalloc(SIZE_ZERO, sizeof(*ptr), FATAL);
+/* Tests that NONFATAL mode gracefully returns NULL on allocation failure */
+static OpStatus allocFailure_NONFATAL_OPERATION();
 
-                /* Check if the pointer can safely be freed */
-                if (ptr) moFree(ptr);
+static Bool test_moCalloc_allocFailure_NONFATAL() {
+        return runTestInChildProcess(
+                "test_moCalloc_allocFailure_NONFATAL()",
+                allocFailure_NONFATAL_OPERATION, EXPECT_FAILURE
+        );
+}
 
-                /* Exit child process cleanly if freeing didn't crash--if the 
-                 * child crashes and exits in error, it will fail the test */
-                _exit(0);
+static OpStatus allocFailure_NONFATAL_OPERATION() {
+        /* Deliberately attempt to allocate too much memory */
+        size_t page;
+        char* ptr = moCalloc(SIZE_HUGE, sizeof(*ptr), NONFATAL);
+
+        /* Failed initial allocation also counts as successful operation fail */
+        if (!ptr) return OP_FAILURE;
+
+        /* Touch each page to force physical allocation. This crashes when 
+         * space runs out */
+        for (page = 0; page < SIZE_HUGE + 1; page += SIZE_PAGE) {
+                ((char*)ptr)[page] = 1;
         }
 
-        /* Wait for the child process to finish */
-        waitpid(pid, &status, 0);
-
-        /* If the child crashes trying to free ptr, test failed */
-        if (WIFEXITED(status) && WEXITSTATUS(status) != 0) return FALSE;
-
-        /* Otherwise, ptr was successfully freed, meaning zero-allocation was 
-         * successful--test passed */
-        return TRUE;
+        /* If we made it this far, the operation failed to fail, so we return 
+         * operation success--test failed */
+        return OP_SUCCESS;
 }
 
-Bool test_moCalloc_zeroAlloc_NONFATAL() {
-        /* Fork a child process, because failure on freeing the pointer will 
-         * result in crash */
-        int status = -99;
-        size_t pid = fork();
-        
-        if ((int)pid < 0) {
-                REPORT_ERR(
-                        NONFATAL, ERR_FORK,
-                        "IN test_moCalloc_zeroAlloc_NONFATAL(); fork failed"
-                );
-                return FALSE;
-        } else if (pid == 0) {
-                /* Attept to allocate size zero memory block */
-                char* ptr = moCalloc(SIZE_ZERO, sizeof(*ptr), NONFATAL);
 
-                /* Exit the process in error if moCalloc() fails */
-                if (!ptr) {
-                        REPORT_ERR(
-                                NONFATAL, ERR_OUT_OF_MEMORY,
-                                "Exiting test early due to moCalloc() failure"
-                        );
-                        _exit(1);
-                
-                /* Otherwise, check if the pointer can safely be freed */
-                } else {
-                        moFree(ptr);
-                }
+/* Tests that FATAL mode doesn't crash on size zero allocation and creates a 
+ * pointer that can be freed without crashing */
+static OpStatus zeroAlloc_FATAL_OPERATION();
 
-                /* Exit child process cleanly if freeing didn't crash--if the 
-                 * child crashes and exits in error, it will fail the test */
-                _exit(0);
-        }
-
-        /* Wait for the child process to finish */
-        waitpid(pid, &status, 0);
-
-        /* If the child crashes trying to free ptr, test failed */
-        if (WIFEXITED(status) && WEXITSTATUS(status) != 0) return FALSE;
-
-        /* Otherwise, ptr was successfully freed, meaning zero-allocation was 
-         * successful--test passed */
-        return TRUE;
+static Bool test_moCalloc_zeroAlloc_FATAL() {
+        return runTestInChildProcess(
+                "test_moCalloc_zeroAlloc_FATAL()", 
+                zeroAlloc_FATAL_OPERATION, EXPECT_SUCCESS
+        );
 }
 
-Bool test_moCalloc_normalAlloc_FATAL() {
+static OpStatus zeroAlloc_FATAL_OPERATION() {
+        /* Attempt to allocate size zero memory block */
+        char* ptr = moCalloc(SIZE_ZERO, sizeof(*ptr), FATAL);
+
+        /* Attempt to free the pointer--test is passed if this doesn't crash */
+        moFree(ptr);
+
+        /* If we get this far, test passed */
+        return OP_SUCCESS;
+}
+
+
+/* Tests that NONFATAL mode creates a valid pointer on size zero allocation and 
+ * that the pointer can safely be freed */
+static OpStatus zeroAlloc_NONFATAL_OPERATION();
+
+static Bool test_moCalloc_zeroAlloc_NONFATAL() {
+        return runTestInChildProcess(
+                "test_moCalloc_zeroAlloc_NONFATAL()", 
+                zeroAlloc_NONFATAL_OPERATION, EXPECT_SUCCESS
+        );
+}
+
+static OpStatus zeroAlloc_NONFATAL_OPERATION() {
+        /* Attempt to allocate size zero memory block */
+        char* ptr = moCalloc(SIZE_ZERO, sizeof(*ptr), NONFATAL);
+
+        /* Fail the test prematurely if allocation fails */
+        if (!ptr) return OP_FAILURE;
+
+        /* Attempt to free the pointer--test is passed if this doesn't crash */
+        moFree(ptr);
+
+        /* If we get this far, test passed */
+        return OP_SUCCESS;
+}
+
+
+static Bool test_moCalloc_normalAlloc_FATAL() {
         /* Fork a child process, because moCalloc failure will crash */
         int status = -99;
         size_t pid = fork();
@@ -263,7 +214,7 @@ Bool test_moCalloc_normalAlloc_FATAL() {
         return TRUE;
 }
 
-Bool test_moCalloc_normalAlloc_NONFATAL() {
+static Bool test_moCalloc_normalAlloc_NONFATAL() {
         /* Attempt a normal-sized allocation */
         char* ptr = moCalloc(SIZE_NORMAL, sizeof(*ptr), NONFATAL);
 
@@ -276,7 +227,7 @@ Bool test_moCalloc_normalAlloc_NONFATAL() {
         return TRUE;
 }
 
-Bool test_moCalloc_largeAlloc_FATAL() {
+static Bool test_moCalloc_largeAlloc_FATAL() {
         /* Fork a child process, because moCalloc failure will crash */
         int status = -99;
         size_t pid = fork();
@@ -308,7 +259,7 @@ Bool test_moCalloc_largeAlloc_FATAL() {
         return TRUE;
 }
 
-Bool test_moCalloc_largeAlloc_NONFATAL() {
+static Bool test_moCalloc_largeAlloc_NONFATAL() {
         /* Attempt a large-but-not-too-large allocation */
         char* ptr = moCalloc(SIZE_LARGE, sizeof(*ptr), NONFATAL);
 
@@ -321,7 +272,7 @@ Bool test_moCalloc_largeAlloc_NONFATAL() {
         return TRUE;
 }
 
-Bool test_moCalloc_nullInit_FATAL() {
+static Bool test_moCalloc_nullInit_FATAL() {
         /* Fork a child process, because moCalloc failure will crash */
         int status = -99;
         size_t pid = fork();
@@ -369,7 +320,7 @@ Bool test_moCalloc_nullInit_FATAL() {
         return TRUE;        
 }
 
-Bool test_moCalloc_nullInit_NONFATAL() {
+static Bool test_moCalloc_nullInit_NONFATAL() {
         /* Attempt a normal-sized allocation--we will rely on moCalloc's 
          * built-in safety check this time */
         char* ptr = moCalloc(SIZE_NORMAL, sizeof(*ptr), NONFATAL);
