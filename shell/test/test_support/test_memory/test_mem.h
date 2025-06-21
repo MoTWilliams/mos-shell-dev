@@ -2,12 +2,11 @@
 #define TEST_MEM_H
 
 #include "moAssert.h"
-#include "moBool.h"
+#include "test_utility.h"
+
 #include "moErr.h"
 
 #include <stdio.h>
-#include <unistd.h>     /* For pid_t and fork() */
-#include <sys/wait.h>   /* For waitpid() */
 #include <limits.h>     /* For ULONG_MAX */
 
 #define SIZE_PAGE       4096            /* 4 KiB (typical memory page size) */
