@@ -1,1 +1,1 @@
-No readme yet, sorry. I'll do it shortly.
+# Mo's Awesome Shell (MASh)
