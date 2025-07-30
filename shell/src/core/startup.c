@@ -6,7 +6,6 @@
 
 #include <stdio.h>
 
-
 int main(int argc, char* argv[]) {
         /* Default (i.e., no arguments) mode is interactive */
         InputMode mode = MODE_INTERACTIVE;
@@ -22,7 +21,7 @@ int main(int argc, char* argv[]) {
         }
 
         /* Welcome message */
-        printf(FG_BLU_B BOLD "\nWelcome to Mo's Shell!\n\n" RESET);
+        printf(FG_BLU_B BOLD "\nWelcome to MASh!\n\n" RESET);
 
         /* If the optional argument is present, set mode to MODE_BATCH */
         if (argv[1]) {
