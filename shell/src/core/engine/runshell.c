@@ -52,7 +52,7 @@ void runShell(InputMode mode, char* srcPath) {
                 /* loop cleanup */
                 toks_destroy(toks);
                 toks = NULL;
-                moFree(input);
+                safeFree(input);
                 input = NULL;
 
                 /* Only run once if in batch input mode */
@@ -62,7 +62,7 @@ void runShell(InputMode mode, char* srcPath) {
         }
 
         /* final cleanup */
-        moFree(input);
+        safeFree(input);
         input = NULL;
 }
 

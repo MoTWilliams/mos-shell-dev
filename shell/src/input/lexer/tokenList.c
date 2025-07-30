@@ -8,7 +8,7 @@
 
 TokList* toks_create(void) {
         /* Allocate space for the token list object */
-        TokList* toks = moMalloc(sizeof(*toks), FATAL);
+        TokList* toks = safeMalloc(sizeof(*toks), FATAL);
 
         /* No metadata to initialize */
 
@@ -31,7 +31,7 @@ void toks_destroy(TokList* toks) {
         /* No metadata to reset */
 
         /* Free token list object */
-        moFree(toks);
+        safeFree(toks);
 }
 
 void toks_addEmptyToken(TokList* toks) {
@@ -88,7 +88,7 @@ void toks_print(TokList* toks) {
                         printf(", ");
                 }
 
-                moFree(types);
+                safeFree(types);
 
                 current = current->next;
         }

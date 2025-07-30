@@ -4,29 +4,29 @@
 #include <string.h>     /* for memcpy() */
 #include <unistd.h>     /* for getpid() */
 
-void* moCalloc(size_t quantity, size_t size, Fatality isFatal) {
+void* safeCalloc(size_t quantity, size_t size, Fatality isFatal) {
         void* newPtr = calloc(quantity, size);
 
         /* Don't limp along if memory allocation fails. Just exit immediately */
         if (!newPtr) {
                 REPORT_ERR(
                         isFatal, ERR_OUT_OF_MEMORY,
-                        "IN moCalloc(); Failed to allocate"
+                        "IN safeCalloc(); Failed to allocate"
                 );
         }
 
         return newPtr;
 }
 
-/* moMalloc() exists for semantic clarity, but it currently zeros out the 
- * allocated space like moCalloc(1, size). This may change in the future. */
-void* moMalloc(size_t size, Fatality isFatal) {
-        return moCalloc(1, size, isFatal);
+/* safeMalloc() exists for semantic clarity, but it currently zeros out the 
+ * allocated space like safeCalloc(1, size). This may change in the future. */
+void* safeMalloc(size_t size, Fatality isFatal) {
+        return safeCalloc(1, size, isFatal);
 }
 
 /* When calling this, remember that resizing from larger to smaller truncates 
  * the data */
-void* moRealloc(void* oldPtr, size_t oldQty, size_t newQty, 
+void* safeRealloc(void* oldPtr, size_t oldQty, size_t newQty, 
                         size_t elemSize, Fatality isFatal) {
         /* Allocate the new block with zeroed-out memory */
         void* newPtr = calloc(newQty, elemSize);
@@ -35,7 +35,7 @@ void* moRealloc(void* oldPtr, size_t oldQty, size_t newQty,
         if (!newPtr) {
                 REPORT_ERR(
                         isFatal, ERR_OUT_OF_MEMORY,
-                        "IN moRealloc(); failed to reallocate"
+                        "IN safeRealloc(); failed to reallocate"
                 );
         }
 
@@ -53,14 +53,14 @@ void* moRealloc(void* oldPtr, size_t oldQty, size_t newQty,
         }
 
         /* Free and empty the old pointer */
-        moFree(oldPtr);
+        safeFree(oldPtr);
 
         /* return the resized memory block */
         return newPtr;
 }
 
 /* This is just free with a safety check */
-void moFree(void* ptr) {
+void safeFree(void* ptr) {
         /* Nothing to free if memory is already free or NULL--not an error */
         if (!ptr) {
                 return;

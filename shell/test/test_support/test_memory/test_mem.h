@@ -25,8 +25,8 @@
 
 int test_mem(int* tTests, int* gTests);
 
-int test_moCalloc(int* tTests, int* gTests);
-int test_moMalloc(int* tTests, int* gTests);
-int test_moRealloc(int* tTests, int* gTests);
+int test_safeCalloc(int* tTests, int* gTests);
+int test_safeMalloc(int* tTests, int* gTests);
+int test_safeRealloc(int* tTests, int* gTests);
 
 #endif

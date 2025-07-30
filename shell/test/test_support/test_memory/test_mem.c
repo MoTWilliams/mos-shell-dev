@@ -5,9 +5,9 @@ int test_mem(int* tTests, int* gTests) {
         int gFails = 0;
         (*gTests) = 0;
         
-        gFails += test_moCalloc(tTests, gTests);
-        gFails += test_moMalloc(tTests, gTests);
-        /* gFails += test_moMalloc(tTests, gTests); */
+        gFails += test_safeCalloc(tTests, gTests);
+        gFails += test_safeMalloc(tTests, gTests);
+        /* gFails += test_safeRealloc(tTests, gTests); */
 
         return gFails;
 }

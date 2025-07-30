@@ -7,7 +7,7 @@
 /* Allocate memory and initialize the buffer's contents and attributes */
 Buffer* buff_create(BuffType type, Fatality isFatal) {
         /* Allocate space for the buffer and its attributes */
-        Buffer* buff = moMalloc(sizeof(*buff), isFatal);
+        Buffer* buff = safeMalloc(sizeof(*buff), isFatal);
 
         /* Immediately return NULL if allocation fails*/
         if (!buff) return NULL;
@@ -18,7 +18,7 @@ Buffer* buff_create(BuffType type, Fatality isFatal) {
         buff->length = 0;
 
         /* Allocate space for the contents */
-        buff->data = moCalloc(buff->capacity + 1, sizeof(*buff->data), isFatal);
+        buff->data = safeCalloc(buff->capacity + 1, sizeof(*buff->data), isFatal);
 
         /* Return the initialized buffer object */
         return buff;
@@ -30,7 +30,7 @@ void buff_destroy(Buffer* buff) {
         if (!buff) return;
 
         /* Free and reset the contents */
-        moFree(buff->data);
+        safeFree(buff->data);
         buff->data = NULL;
 
         /* Reset metadata */
@@ -39,7 +39,7 @@ void buff_destroy(Buffer* buff) {
         buff->length = 0;
 
         /* Free and reset the buffer */
-        moFree(buff);
+        safeFree(buff);
 }
 
 /* Double the capacity of the buffer */
@@ -53,7 +53,7 @@ Buffer* buff_resize(Buffer* buff, Fatality isFatal) {
         if (!buff) return NULL;
 
         /* Re-allocate memory for the larger contents. + 1 for null-teminator */
-        buff->data = moRealloc(
+        buff->data = safeRealloc(
                 buff->data, oldCapacity + 1, newCapacity + 1, 
                 sizeof(*buff->data), isFatal
         );

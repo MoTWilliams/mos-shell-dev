@@ -389,6 +389,6 @@ static Keyword wordTok_setKType(Token* tok) {
         if (!strcmp(tokStr, "case")) kType = KEY_CASE;
         if (!strcmp(tokStr, "esac")) kType = KEY_ESAC;
 
-        free(tokStr);
+        safeFree(tokStr);
         return kType;
 }

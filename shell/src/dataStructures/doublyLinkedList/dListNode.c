@@ -6,9 +6,9 @@
 
 DLNode* dNode_create(NodeType type, Fatality isFatal) {
         /* Allocate space for the node */
-        DLNode* node = moMalloc(sizeof(*node), isFatal);
+        DLNode* node = safeMalloc(sizeof(*node), isFatal);
 
-        /* Return NULL on nonfatal moMalloc failure */
+        /* Return NULL on nonfatal safeMalloc failure */
         if (!node) return NULL;
 
         /* Set the node's type */
@@ -44,5 +44,5 @@ void dNode_destroy(DLNode* node) {
         }
 
         /* Free the node */
-        moFree(node);
+        safeFree(node);
 }
