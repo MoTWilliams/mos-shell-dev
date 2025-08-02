@@ -2,7 +2,7 @@
 #include "token.h"
 
 #include "mem.h"
-#include "moErr.h"
+#include "handleErrors.h"
 
 #include <stdio.h>
 

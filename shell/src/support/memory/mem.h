@@ -1,7 +1,7 @@
 #ifndef MEM_H
 #define MEM_H
 
-#include "moErr.h"
+#include "handleErrors.h"
 
 #include <stdlib.h>
 

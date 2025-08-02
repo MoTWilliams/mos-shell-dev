@@ -1,7 +1,7 @@
 #ifndef MO_ASSERT_H
 #define MO_ASSERT_H
 
-#include "moBool.h"
+#include "boolType.h"
 #include "test_utility.h"
 
 typedef enum {

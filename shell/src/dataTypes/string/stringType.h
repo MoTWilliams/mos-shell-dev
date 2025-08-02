@@ -3,7 +3,7 @@
 
 #include "buffer.h"
 
-#include "moErr.h"
+#include "handleErrors.h"
 
 #define STR_AT(str, pos) ((str)->buff->data[(pos)].chr)
 #define STR_LEN(str) ((str)->buff->length)

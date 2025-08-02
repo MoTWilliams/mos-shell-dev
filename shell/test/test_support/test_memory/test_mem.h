@@ -1,10 +1,10 @@
 #ifndef TEST_MEM_H
 #define TEST_MEM_H
 
-#include "moAssert.h"
+#include "test_assert.h"
 #include "test_utility.h"
 
-#include "moErr.h"
+#include "handleErrors.h"
 
 #include <stdio.h>
 #include <limits.h>     /* For ULONG_MAX */

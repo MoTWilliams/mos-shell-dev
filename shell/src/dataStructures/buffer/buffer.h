@@ -1,7 +1,7 @@
 #ifndef BUFFER_H
 #define BUFFER_H
 
-#include "moErr.h"
+#include "handleErrors.h"
 
 /* Forward-declarations */
 struct String;

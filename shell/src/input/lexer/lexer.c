@@ -1,9 +1,9 @@
 #include "input.h"
 #include "tokenList.h"
 
-#include "moString.h"
+#include "stringType.h"
 #include "mem.h"
-#include "moBool.h"  /* For Boolean values */
+#include "boolType.h"  /* For Boolean values */
 
 #include <stdio.h>      /* For EOF */
 #include <string.h>

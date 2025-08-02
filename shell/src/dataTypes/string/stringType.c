@@ -1,4 +1,4 @@
-#include "moString.h"
+#include "stringType.h"
 
 #include "mem.h"
 

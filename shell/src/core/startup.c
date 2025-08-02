@@ -1,7 +1,7 @@
 #include "engine.h"
 #include "input.h" /* For InputMode */
 
-#include "moErr.h"
+#include "handleErrors.h"
 #include "textStylesAndColors.h"
 
 #include <stdio.h>
