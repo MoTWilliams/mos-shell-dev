@@ -1,4 +1,4 @@
-#include "moString.h"
+#include "stringType.h"
 
 #include "mem.h"
 
@@ -7,7 +7,7 @@
 /* Allocate memory and initialize the string's contents and metadata */
 String* str_create(Fatality isFatal) {
         /* Allocate space for the string object */
-        String* str = moMalloc(sizeof(*str), isFatal);
+        String* str = safeMalloc(sizeof(*str), isFatal);
 
         /* Do nothing and return NULL on allocation failure */
         if (!str) return NULL;
@@ -33,7 +33,7 @@ void str_destroy(String* str) {
         /* No metadata to reset */
 
         /* Free and reset the string object */
-        moFree(str);
+        safeFree(str);
 }
 
 /* Append helper */
@@ -103,7 +103,7 @@ static char getCharFrom_string(char* src, int index) {
 char* str_getText(String* str, Fatality isFatal) {
         /* Allocate space for the c-string. +1 to ensure space for the 
          * null-terminator */
-        char* out = moCalloc(STR_LEN(str) + 1, sizeof(*out), isFatal);
+        char* out = safeCalloc(STR_LEN(str) + 1, sizeof(*out), isFatal);
         int i;  /* Counter */
 
         /* Do nothing and return NULL on nonfatal allocation error */

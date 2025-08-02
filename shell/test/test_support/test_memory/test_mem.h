@@ -1,10 +1,10 @@
 #ifndef TEST_MEM_H
 #define TEST_MEM_H
 
-#include "moAssert.h"
+#include "test_assert.h"
 #include "test_utility.h"
 
-#include "moErr.h"
+#include "handleErrors.h"
 
 #include <stdio.h>
 #include <limits.h>     /* For ULONG_MAX */
@@ -25,8 +25,8 @@
 
 int test_mem(int* tTests, int* gTests);
 
-int test_moCalloc(int* tTests, int* gTests);
-int test_moMalloc(int* tTests, int* gTests);
-int test_moRealloc(int* tTests, int* gTests);
+int test_safeCalloc(int* tTests, int* gTests);
+int test_safeMalloc(int* tTests, int* gTests);
+int test_safeRealloc(int* tTests, int* gTests);
 
 #endif

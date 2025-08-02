@@ -1,8 +1,8 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-#include "moString.h"
-#include "moBool.h"  /* For Boolean values */
+#include "stringType.h"
+#include "boolType.h"  /* For Boolean values */
 
 struct Token;
 typedef struct Token Token;

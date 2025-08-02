@@ -1,4 +1,4 @@
-#include "moAssert.h"
+#include "test_assert.h"
 #include "test_mem.h"
 
 #include <stdio.h>
@@ -10,7 +10,7 @@ typedef enum {
         FAILS
 } GroupScores;
 
-int main() {
+int main(void) {
         /* Tally tests and fails per group */
         int scores[NUM_GROUPS][2] = {0};
         int group;

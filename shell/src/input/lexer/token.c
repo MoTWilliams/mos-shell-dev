@@ -1,15 +1,15 @@
 #include "token.h"
-#include "moString.h"
+#include "stringType.h"
 
 #include "mem.h"
-#include "moErr.h"
+#include "handleErrors.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
 Token* token_create(void) {
         /* ALlocate space for the token object */
-        Token* tok = moMalloc(sizeof(*tok), FATAL);
+        Token* tok = safeMalloc(sizeof(*tok), FATAL);
 
         /* Initialize Metadata */
         tok->lineNo = 0;
@@ -44,7 +44,7 @@ void token_destroy(Token* tok) {
         tok->untermQ = FALSE;
 
         /* Free the token object */
-        moFree(tok);
+        safeFree(tok);
 }
 
 void token_appendChar(Token* tok, char* src, int pos, QType qType) {
@@ -73,5 +73,5 @@ void token_print(Token* tok) {
 
         printf("%s", tokTextPlain);
 
-        moFree(tokTextPlain);
+        safeFree(tokTextPlain);
 }

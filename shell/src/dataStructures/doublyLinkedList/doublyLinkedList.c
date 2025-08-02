@@ -4,7 +4,7 @@
 
 DList* dList_create(Fatality isFatal) {
         /* Allocate memory for the list */
-        DList* list = moMalloc(sizeof(*list), isFatal);
+        DList* list = safeMalloc(sizeof(*list), isFatal);
 
         /* Do nothing and return NULL on nonfatal allocation failure */
         if (!list) return NULL;
@@ -40,7 +40,7 @@ void dList_destroy(DList* list) {
         }
 
         /* Then destroy the list */
-        moFree(list);
+        safeFree(list);
 }
 
 DLNode* dList_append(DList* list, NodeType type, Fatality isFatal) {

@@ -3,7 +3,7 @@
 
 #include "buffer.h"
 
-#include "moErr.h"
+#include "handleErrors.h"
 
 #define STR_AT(str, pos) ((str)->buff->data[(pos)].chr)
 #define STR_LEN(str) ((str)->buff->length)
@@ -30,7 +30,7 @@ void str_destroy(String* str);
 char str_append(String* str, void* src, int pos, Fatality isFatal);
 
 /* Retrieve the string's contents - always free() after calling. 
- * Null-terminator is guaranteed due to zeroed memory in moMalloc() */
+ * Null-terminator is guaranteed due to zeroed memory in safeMalloc() */
 char* str_getText(String* str, Fatality isFatal);
 
 #endif

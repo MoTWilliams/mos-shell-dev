@@ -1,8 +1,8 @@
 #include "input.h"
 
-#include "moString.h"
+#include "stringType.h"
 #include "mem.h"
-#include "moErr.h"
+#include "handleErrors.h"
 #include "textStylesAndColors.h"
 
 #include <stdio.h>

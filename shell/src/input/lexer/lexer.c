@@ -1,9 +1,9 @@
 #include "input.h"
 #include "tokenList.h"
 
-#include "moString.h"
+#include "stringType.h"
 #include "mem.h"
-#include "moBool.h"  /* For Boolean values */
+#include "boolType.h"  /* For Boolean values */
 
 #include <stdio.h>      /* For EOF */
 #include <string.h>
@@ -389,6 +389,6 @@ static Keyword wordTok_setKType(Token* tok) {
         if (!strcmp(tokStr, "case")) kType = KEY_CASE;
         if (!strcmp(tokStr, "esac")) kType = KEY_ESAC;
 
-        free(tokStr);
+        safeFree(tokStr);
         return kType;
 }

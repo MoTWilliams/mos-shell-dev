@@ -1,7 +1,7 @@
 #ifndef TEST_UTILITY_H
 #define TEST_UTILITY_H
 
-#include "moBool.h"
+#include "boolType.h"
 #include <unistd.h>     /* For pid_t and fork() */
 #include <sys/wait.h>   /* For waitpid() */
 
