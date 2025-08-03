@@ -112,8 +112,6 @@ void toks_print(TokList* toks) {
                         case TOK_HERE_STRIP: printf("TOK_HERE_STRIP"); break;
                         case TOK_REDIR_OUT: printf("TOK_REDIR_OUT"); break;
                         case TOK_APPEND: printf("TOK_APPEND"); break;
-                        case TOK_PAREN_L: printf("TOK_PAREN_L"); break;
-                        case TOK_PAREN_R: printf("TOK_PAREN_R"); break;
                         default: printf("No token type"); break;
                 }
 
@@ -148,6 +146,12 @@ void toks_print(TokList* toks) {
                         /* Switch/case statements */
                         case KEY_CASE: printf("KEY_CASE"); break;
                         case KEY_ESAC: printf("KEY_ESAC"); break;
+
+                        /* Subshells and curly braces */
+                        case KEY_L_PAREN: printf("KEY_L_PAREN"); break;
+                        case KEY_R_PAREN: printf("KEY_R_PAREN"); break;
+                        case KEY_L_BRACE: printf("KEY_L_BRACE"); break;
+                        case KEY_R_BRACE: printf("KEY_R_BRACE"); break; 
 
                         /* Not a keyword or error */
                         default: printf("Not a keyword"); break;

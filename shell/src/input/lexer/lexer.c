@@ -48,8 +48,8 @@ TokList* input_lex(char* input) {
                 }
 
                 /* Tokenize operators (;,|,||,&,&&,<,<<,>,>>) and other
-                 * symbols  (!,(),[],{}) */
-                if (strchr(";|&<>!()", input[pos])) {
+                 * symbols  (!,(),{}) */
+                if (strchr(";|&<>!(){}", input[pos])) {
                         tokenize_symbolTok(
                                 toks, input, &pos, &inTok, &curLineNo
                         );
@@ -187,11 +187,27 @@ static void tokenize_symbolTok(
                         /* Otherwise, it's just > */
                         TOKS_TAIL(toks)->tType = TOK_REDIR_OUT;
                         break;
+                
+                /* SPECIAL CASES: These symbols are used to set off subshells
+                 * and compound commands. Technically, they are word tokens
+                 * with special keyword statuses. However, detecting these and
+                 * setting their kTypes in tokenize_wordTok() would have been
+                 * difficult and messy. We'll just do it here instead. */
                 case '(':
-                        TOKS_TAIL(toks)->tType = TOK_PAREN_L;
+                        TOKS_TAIL(toks)->tType = TOK_WORD;
+                        TOKS_TAIL(toks)->kType = KEY_L_PAREN;
                         break;
                 case ')':
-                        TOKS_TAIL(toks)->tType = TOK_PAREN_R;
+                        TOKS_TAIL(toks)->tType = TOK_WORD;
+                        TOKS_TAIL(toks)->kType = KEY_R_PAREN;
+                        break;
+                case '{':
+                        TOKS_TAIL(toks)->tType = TOK_WORD;
+                        TOKS_TAIL(toks)->kType = KEY_L_BRACE;
+                        break;
+                case '}':
+                        TOKS_TAIL(toks)->tType = TOK_WORD;
+                        TOKS_TAIL(toks)->kType = KEY_R_BRACE;
                         break;
                 default:
                         break;
@@ -234,7 +250,7 @@ static void tokenize_wordTok(
 
                 /* Exit the loop at the end of a word or a special character */
                 if (qContext == Q_NONE &&
-                                (isspace(c) || strchr(";|&<>!()", c))) {
+                                (isspace(c) || strchr(";|&<>!(){}", c))) {
                         break;
                 }
 
@@ -388,6 +404,12 @@ static Keyword wordTok_setKType(Token* tok) {
         /* Switch/case statements */
         if (!strcmp(tokStr, "case")) kType = KEY_CASE;
         if (!strcmp(tokStr, "esac")) kType = KEY_ESAC;
+
+        /* Subshells and curly braces */
+        if (!strcmp(tokStr, "(")) kType = KEY_L_PAREN;
+        if (!strcmp(tokStr, ")")) kType = KEY_R_PAREN;
+        if (!strcmp(tokStr, "{")) kType = KEY_L_BRACE;
+        if (!strcmp(tokStr, "}")) kType = KEY_R_BRACE;
 
         safeFree(tokStr);
         return kType;
