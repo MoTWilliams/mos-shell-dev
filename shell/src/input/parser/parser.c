@@ -1,3 +1,3 @@
-#include "parser.h"
+#include "input.h"
 
-void placeholder8(void) {}
+void input_parse(void) {}
