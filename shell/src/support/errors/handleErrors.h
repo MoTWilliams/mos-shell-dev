@@ -10,7 +10,8 @@ typedef enum {
         ERR_NONE,
         ERR_INPUT,
         ERR_OUT_OF_MEMORY,
-        ERR_FORK
+        ERR_FORK,
+        ERR_NODE_TYPE
 } ErrNo;
 
 ErrNo report_err(Fatality fatal, ErrNo errNo, char* msg,
