@@ -17,9 +17,9 @@ char* input_capture(InputMode mode, char* srcPath);
 struct TokList* input_lex(char* input);
 
 /* Expand variables and substituted commands */
-void input_expand();
+void input_expand(void);
 
 /* Create the parse tree */
-void input_parse();
+void input_parse(void);
 
 #endif

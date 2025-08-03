@@ -4,7 +4,7 @@
 
 #include "handleErrors.h"
 
-/* Forward declarations */
+/* FORWARD DECLARATIONS */
 
 /* Base node */
 struct DLNode;
