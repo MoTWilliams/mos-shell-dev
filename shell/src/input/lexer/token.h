@@ -22,7 +22,7 @@ typedef enum {
         TOK_HEREDOC,            /* 10: << */
         TOK_HERE_STRIP,         /* 11: <<- (heredoc with tab stripping) */
         TOK_REDIR_OUT,          /* 11: > */
-        TOK_APPEND             /* 12: >> */
+        TOK_APPEND              /* 12: >> */
 } TokType;
 
 /* Quote context labels */
