@@ -18,6 +18,9 @@ void runShell(InputMode mode, char* srcPath) {
                 /* Store the list of tokens */
                 TokList* toks = NULL;
 
+                /* Store the parse tree */
+                PTree* pTree = NULL;
+
                 /* Print the command prompt in interactive mode */
                 if (mode == MODE_INTERACTIVE) {
                         cmdPrompt();
@@ -49,7 +52,12 @@ void runShell(InputMode mode, char* srcPath) {
                 /* DEBUG: Print the tokens and their metadata */
                 toks_print(toks);
 
+                /* Build the parse tree */
+                pTree = input_parse(toks);
+
                 /* loop cleanup */
+                pTree_destroy(pTree);
+                pTree = NULL;
                 toks_destroy(toks);
                 toks = NULL;
                 safeFree(input);
