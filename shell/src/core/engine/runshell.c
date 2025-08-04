@@ -16,7 +16,7 @@ void runShell(InputMode mode, char* srcPath) {
          * be abstracted into a handle_input() function */
         while (1) {
                 /* Store the list of tokens */
-                TokList* toks = NULL;
+                TokenList* tList = NULL;
 
                 /* Print the command prompt in interactive mode */
                 if (mode == MODE_INTERACTIVE) {
@@ -44,14 +44,14 @@ void runShell(InputMode mode, char* srcPath) {
                 }
 
                 /* Split the input into tokens */
-                toks = input_lex(input);
+                tList = input_lex(input);
 
                 /* DEBUG: Print the tokens and their metadata */
-                toks_print(toks);
+                tList_print_DEBUG(tList);
 
                 /* loop cleanup */
-                toks_destroy(toks);
-                toks = NULL;
+                tList_destroy(tList);
+                tList = NULL;
                 safeFree(input);
                 input = NULL;
 
