@@ -1,6 +1,6 @@
 #include "input.h"
-#include "newTokenList.h"
-#include "newTokenNode.h"
+#include "tokenList.h"
+#include "tokenNode.h"
 
 #include "stringType.h"
 #include "mem.h"

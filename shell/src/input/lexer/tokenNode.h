@@ -1,5 +1,5 @@
-#ifndef NEW_TOKEN_NODE_H
-#define NEW_TOKEN_NODE_H
+#ifndef TOKEN_NODE_H
+#define TOKEN_NODE_H
 
 #include "stringType.h"
 #include "boolType.h"

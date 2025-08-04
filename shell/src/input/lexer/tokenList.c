@@ -1,5 +1,5 @@
-#include "newTokenList.h"
-#include "newTokenNode.h"
+#include "tokenList.h"
+#include "tokenNode.h"
 
 #include "mem.h"
 #include "handleErrors.h"
