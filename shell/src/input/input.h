@@ -1,7 +1,7 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-#include "tokenList.h"
+#include "newTokenList.h"
 
 /* ---Input capture and processing--- */
 
@@ -14,7 +14,7 @@ typedef enum {
 char* input_capture(InputMode mode, char* srcPath); 
 
 /* Break the input into tokens */
-struct TokList* input_lex(char* input);
+struct TokenList* input_lex(char* input);
 
 /* Expand variables and substituted commands */
 void input_expand();
