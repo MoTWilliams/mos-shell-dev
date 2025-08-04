@@ -59,3 +59,5 @@ shell/.vscode/
 practice/parseTree.c
 practice/tokenizer.c
 
+# Old stuff that should probably be deleted eventually
+old/
