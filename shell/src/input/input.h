@@ -2,6 +2,7 @@
 #define INPUT_H
 
 #include "tokenList.h"
+#include "parseTree.h"
 
 /* ---Input capture and processing--- */
 
@@ -14,12 +15,12 @@ typedef enum {
 char* input_capture(InputMode mode, char* srcPath); 
 
 /* Break the input into tokens */
-struct TokList* input_lex(char* input);
+TokList* input_lex(char* input);
 
 /* Expand variables and substituted commands */
 void input_expand(void);
 
 /* Create the parse tree */
-void input_parse(void);
+PTree* input_parse(TokList* toks);
 
 #endif
