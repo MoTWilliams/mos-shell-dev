@@ -1,5 +1,5 @@
-#ifndef NEW_TOKEN_LIST_H
-#define NEW_TOKEN_LIST_H
+#ifndef TOKEN_LIST_H
+#define TOKEN_LIST_H
 
 struct Token;
 

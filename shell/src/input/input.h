@@ -1,7 +1,7 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-#include "newTokenList.h"
+#include "tokenList.h"
 
 /* ---Input capture and processing--- */
 
