@@ -1,6 +1,7 @@
 #include "input.h"
 #include "tokenList.h"
 #include "tokenNode.h"
+#include "heredoc.h"
 
 #include "stringType.h"
 #include "mem.h"
@@ -22,6 +23,7 @@ static void tokenize_wordTok(
 
 TokenList* input_lex(char* input) {
         TokenList* tList = tList_create();  /* Empty list to hold the tokens */
+        LexerMode mode = LEX_NORMAL;    /* Used for gathering heredoc bodies */
         Bool inTok = FALSE;             /* Cursor context */
         int pos = 0;                    /* Position in the input string */
         int curLineNo = 1;              /* Line counter */
@@ -43,6 +45,7 @@ TokenList* input_lex(char* input) {
                         continue;
                 }
 
+                /* Skip comments */
                 if (input[pos] == '#') {
                         handle_comments(input, &pos, &curLineNo);
                         continue;
@@ -213,7 +216,7 @@ static void tokenize_symbolTok(
                         break;
         }
 
-        tList->tail->lineNo = *curLineNo;
+        tList->tail->firstLine = *curLineNo;
 
         /* Leave the token */
         (*pos)++;
@@ -222,8 +225,6 @@ static void tokenize_symbolTok(
 
 /* Word token helpers */
 static QType wordTok_getCharQType(char* input, int pos);
-/*static void wordTok_skipComment(
-        char* input, int* pos, Bool* inTok, int* curLineNo);*/
 static void wordTok_tokenizeRecursiveCmdSub(
         TokenList* tList, char* input, int* pos, QType* qContext);
 static void wordTok_escape(
@@ -238,7 +239,7 @@ static void tokenize_wordTok(
         /* Start a new word token */
         tList_addEmptyToken(tList);
         tList->tail->tType = TOK_WORD;
-        tList->tail->lineNo = *curLineNo;
+        tList->tail->firstLine = *curLineNo;
         *inTok = TRUE;
 
         /* Loop to end of the input string */
