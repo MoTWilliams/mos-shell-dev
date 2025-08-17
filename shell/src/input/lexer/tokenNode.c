@@ -17,7 +17,7 @@ Token* token_create(void) {
         tok->next = NULL;       
 
         /* Initialize Metadata */
-        tok->lineNo = 0;
+        tok->firstLine = 0;
         tok->tType = TOK_WORD;
         tok->kType = KEY_NOTYPE;
         tok->cqTypes = str_create(FATAL);
@@ -41,7 +41,7 @@ void token_destroy(Token* tok) {
         tok->next = NULL;
 
         /* Free and reset metadata */
-        tok->lineNo = 0;
+        tok->firstLine = 0;
         tok->tType = TOK_WORD;
         tok->kType = KEY_NOTYPE;
         str_destroy(tok->cqTypes);
