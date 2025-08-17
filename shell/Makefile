@@ -8,7 +8,7 @@ INCLUDES = $(shell find src test -name '*.h' -exec dirname {} \; | sort -u)
 CFLAGS = -std=c89 -pedantic -Wall -Wextra -g $(addprefix -I, $(INCLUDES))
 
 # Recursively include all .c files in src/
-SRC = $(wildcard src/*.c src/*/*.c src/*/*/*.c)
+SRC = $(wildcard src/*.c src/*/*.c src/*/*/*.c src/*/*/*/*.c)
 OBJ = $(SRC:.c=.o)
 
 # For unit tests
