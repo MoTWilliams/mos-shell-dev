@@ -74,7 +74,7 @@ void tList_print_DEBUG(TokenList* tList) {
         curTok = tList->head;
         printf("Line numbers: [");
         while (curTok) {
-                printf("%d", curTok->lineNo);
+                printf("%d", curTok->firstLine);
                 if (curTok->next) printf(" ");
                 curTok = curTok->next;
         }
