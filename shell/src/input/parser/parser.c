@@ -1,3 +1,6 @@
-#include "parser.h"
+#include "input.h"
+#include "pTreeNode.h"
 
-void placeholder8(void) {}
+PTree* input_parse(TokenList* tList) {
+        
+}
